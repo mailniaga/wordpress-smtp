@@ -12,6 +12,7 @@ class MailniagaConnector {
 	private MailniagaFailedDeliveriesLog $failed_deliveries_log;
 	private MailniagaEmailLogCleaner $email_log_cleaner;
 	private MailniagaCheckBalance $check_balance;
+	private MailniagaActionSchedulerCleaner $action_scheduler_cleaner;
 
 
 
@@ -24,6 +25,7 @@ class MailniagaConnector {
 		$this->failed_deliveries_log = new MailniagaFailedDeliveriesLog();
 		$this->email_log_cleaner = new MailniagaEmailLogCleaner();
 		$this->check_balance = new MailniagaCheckBalance($this->settings);
+		$this->action_scheduler_cleaner = new MailniagaActionSchedulerCleaner();
 	}
 
 	public static function get_instance(): ?MailniagaConnector {
@@ -43,6 +45,7 @@ class MailniagaConnector {
 		$this->failed_deliveries_log->register();
 		$this->email_log_cleaner->register();
 		$this->check_balance->register();
+		$this->action_scheduler_cleaner->register();
 
 		add_action('admin_post_mailniaga_send_test_email', [$this, 'handle_test_email']);
 		add_action('admin_notices', [$this, 'display_test_email_result']);

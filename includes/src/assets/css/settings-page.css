@@ -118,6 +118,20 @@
     margin-top: 5px;
 }
 
+.datetime-wrapper {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.date-picker {
+    width: 100px;
+    margin-right: 5px;
+}
+
+.time-picker {
+    width: 100px;
+}
+
 /* API Verification Styles */
 #api-verification-results {
     background: var(--light-beige);

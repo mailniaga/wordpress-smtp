@@ -3,7 +3,7 @@
         'name' => 'webimpian/mailniaga-wp-connector',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '10d2719c6c3fc6712bf58442ed6e357bd593b98d',
+        'reference' => 'e251f00736e1eeef80ca80b14ff2882f1be9d7e9',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../../',
         'aliases' => array(),
@@ -103,7 +103,7 @@
         'webimpian/mailniaga-wp-connector' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '10d2719c6c3fc6712bf58442ed6e357bd593b98d',
+            'reference' => 'e251f00736e1eeef80ca80b14ff2882f1be9d7e9',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../../',
             'aliases' => array(),

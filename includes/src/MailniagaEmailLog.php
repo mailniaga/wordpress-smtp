@@ -142,7 +142,8 @@ class MailniagaEmailLog {
                         <th><?php _e('To', 'mailniaga-smtp'); ?></th>
                         <th><?php _e('Subject', 'mailniaga-smtp'); ?></th>
                         <th><?php _e('Status', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('Created At', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('Created', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('Updated', 'mailniaga-smtp'); ?></th>
                         <th><?php _e('Actions', 'mailniaga-smtp'); ?></th>
                     </tr>
                     </thead>
@@ -167,6 +168,7 @@ class MailniagaEmailLog {
                             <td><?php echo esc_html($email->subject); ?></td>
                             <td><?php echo esc_html($email->status); ?></td>
                             <td><?php echo esc_html($email->created_at); ?></td>
+                            <td><?php echo esc_html($email->updated_at); ?></td>
                             <td>
                                 <a href="#" class="view-details" data-id="<?php echo esc_attr($email->id); ?>"><?php _e('View Details', 'mailniaga-smtp'); ?></a>
                             </td>
