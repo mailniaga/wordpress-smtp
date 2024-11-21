@@ -48,10 +48,10 @@ class WebhookHandler {
 	private function process_webhook() {
 		$content_type = $_SERVER['CONTENT_TYPE'] ?? '';
 
-		$this->log_message("Processing webhook. Content-Type: $content_type");
+		//$this->log_message("Processing webhook. Content-Type: $content_type");
 
 		if (strpos($content_type, 'application/x-www-form-urlencoded') === false) {
-			$this->log_message("Unsupported content type: $content_type");
+			//$this->log_message("Unsupported content type: $content_type");
 			wp_send_json(['status' => 'error', 'message' => 'Unsupported content type'], 415);
 			exit;
 		}

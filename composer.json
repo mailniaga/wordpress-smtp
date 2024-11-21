@@ -15,6 +15,9 @@
         "woocommerce/action-scheduler": "^3.4"
     },
     "config": {
-        "vendor-dir": "includes/vendor"
+        "vendor-dir": "includes/vendor",
+        "platform": {
+            "php": "7.4"
+        }
     }
 }
