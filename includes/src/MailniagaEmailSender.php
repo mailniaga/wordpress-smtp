@@ -9,11 +9,18 @@ use GuzzleHttp\Promise;
 class MailniagaEmailSender {
 	private $settings;
 	private $client;
-	private $concurrency = 200;
-	private $batch_size = 1000;
+	private $concurrency;
+	private $batch_size;
 
 	public function __construct($settings) {
 		$this->settings = $settings;
+		$this->concurrency = intval($settings['concurrency'] ?? 100);
+		$this->batch_size = intval($settings['batch_size'] ?? 100);
+
+		// Ensure values are within acceptable ranges
+		$this->concurrency = min(max($this->concurrency, 1), 500);
+		$this->batch_size = min(max($this->batch_size, 1), 5000);
+
 		$this->client = new Client([
 			'base_uri' => 'https://api.mailniaga.mx/api/v0/',
 			'timeout'  => 30,

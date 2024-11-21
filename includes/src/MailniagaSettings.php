@@ -10,6 +10,7 @@ class MailniagaSettings {
 		add_action('wp_ajax_generate_mailniaga_webhook', [$this, 'generate_webhook']);
 		add_action('admin_bar_menu', [$this, 'add_credit_balance_to_admin_bar'], 100);
 		add_action('admin_head', [$this, 'add_credit_balance_styles']);
+		add_action('admin_head', [$this, 'add_admin_styles']);
 	}
 
 	public function register() {
@@ -65,7 +66,13 @@ class MailniagaSettings {
 	}
 
 	public function register_settings() {
-		register_setting('mailniaga_wp_connector_settings', 'mailniaga_wp_connector_settings');
+		register_setting(
+			'mailniaga_wp_connector_settings',
+			'mailniaga_wp_connector_settings',
+			[
+				'sanitize_callback' => [$this, 'sanitize_settings']
+			]
+		);
 
 		add_settings_section(
 			'mailniaga_wp_connector_main',
@@ -74,18 +81,30 @@ class MailniagaSettings {
 			'mailniaga-smtp'
 		);
 
+		add_settings_section(
+			'mailniaga_wp_connector_performance',
+			__('Performance Settings', 'mailniaga-smtp'),
+			[$this, 'render_performance_section_description'],
+			'mailniaga-smtp'
+		);
+
 		$this->add_settings_fields();
 	}
 
 	private function add_settings_fields() {
-		$fields = [
+		$main_fields = [
 			'api_key' => __('Mail Niaga API Key', 'mailniaga-smtp'),
 			'from_email' => __('Default From Email', 'mailniaga-smtp'),
 			'from_name' => __('Default From Name', 'mailniaga-smtp'),
 			'webhook' => __('Webhook (Funnelkit Only)', 'mailniaga-smtp'),
 		];
 
-		foreach ($fields as $key => $label) {
+		$performance_fields = [
+			'concurrency' => __('Concurrency', 'mailniaga-smtp'),
+			'batch_size' => __('Batch Size', 'mailniaga-smtp'),
+		];
+
+		foreach ($main_fields as $key => $label) {
 			add_settings_field(
 				'mailniaga_' . $key,
 				$label,
@@ -94,6 +113,22 @@ class MailniagaSettings {
 				'mailniaga_wp_connector_main'
 			);
 		}
+
+		foreach ($performance_fields as $key => $label) {
+			add_settings_field(
+				'mailniaga_' . $key,
+				$label,
+				[$this, $key . '_callback'],
+				'mailniaga-smtp',
+				'mailniaga_wp_connector_performance'
+			);
+		}
+	}
+
+	public function render_performance_section_description() {
+		echo '<div class="notice notice-warning inline">';
+		echo '<p>' . __('These settings control how emails are processed and sent. Higher values can speed up email sending but may use more server resources. If you experience server issues, try lowering these values.', 'mailniaga-smtp') . '</p>';
+		echo '</div>';
 	}
 
 	public function api_key_callback() {
@@ -115,6 +150,120 @@ class MailniagaSettings {
 
 	public function webhook_callback() {
 		$this->render_webhook_field();
+	}
+
+	public function concurrency_callback() {
+		$value = $this->settings['concurrency'] ?? 100;
+		echo "<input type='number' name='mailniaga_wp_connector_settings[concurrency]' value='" . esc_attr($value) . "' class='small-text' min='1' max='500'>";
+		echo "<div class='description mailniaga-setting-description'>";
+		echo "<p class='setting-intro'>" . __('How many emails to send at the same time. Higher values send emails faster but use more server resources:', 'mailniaga-smtp') . "</p>";
+		echo "<div class='mailniaga-recommendations'>";
+		echo "<div class='recommendation-item recommendation-low'>";
+		echo "<strong>" . __('Low Server Resources', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(Shared Hosting)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 20-50', 'mailniaga-smtp') . "</span>";
+		echo "</div>";
+		echo "<div class='recommendation-item recommendation-medium'>";
+		echo "<strong>" . __('Medium Server Resources', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(VPS)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 50-200', 'mailniaga-smtp') . "</span>";
+		echo "</div>";
+		echo "<div class='recommendation-item recommendation-high'>";
+		echo "<strong>" . __('High Server Resources', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(Dedicated)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 200-500', 'mailniaga-smtp') . "</span>";
+		echo "</div>";
+		echo "</div>";
+		echo "<p class='setting-note'>" . __('Default: 100. If unsure, start low and increase gradually while monitoring server performance.', 'mailniaga-smtp') . "</p>";
+		echo "</div>";
+	}
+
+	public function batch_size_callback() {
+		$value = $this->settings['batch_size'] ?? 100;
+		echo "<input type='number' name='mailniaga_wp_connector_settings[batch_size]' value='" . esc_attr($value) . "' class='small-text' min='1' max='5000'>";
+		echo "<div class='description mailniaga-setting-description'>";
+		echo "<p class='setting-intro'>" . __('How many emails to pull from the queue at once. Higher values mean fewer database queries but more memory usage:', 'mailniaga-smtp') . "</p>";
+		echo "<div class='mailniaga-recommendations'>";
+		echo "<div class='recommendation-item recommendation-low'>";
+		echo "<strong>" . __('Low Memory', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(< 2GB)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 50-100', 'mailniaga-smtp') . "</span>";
+		echo "</div>";
+		echo "<div class='recommendation-item recommendation-medium'>";
+		echo "<strong>" . __('Medium Memory', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(5GB-20GB)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 100-1000', 'mailniaga-smtp') . "</span>";
+		echo "</div>";
+		echo "<div class='recommendation-item recommendation-high'>";
+		echo "<strong>" . __('High Memory', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(> 20GB)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 1000-5000', 'mailniaga-smtp') . "</span>";
+		echo "</div>";
+		echo "</div>";
+		echo "<p class='setting-note'>" . __('Default: 100. If you see memory errors, reduce this value.', 'mailniaga-smtp') . "</p>";
+		echo "</div>";
+	}
+
+	public function add_admin_styles() {
+		echo "<style>
+        .mailniaga-setting-description {
+            margin-top: 8px;
+            max-width: 800px;
+        }
+        .setting-intro {
+            margin-bottom: 12px!important;
+            color: #1e1e1e;
+            font-size: 13px;
+        }
+        .mailniaga-recommendations {
+            background: #fff;
+            border: 1px solid #dcdcde;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 3px;
+            background: #f0f0f1;
+        }
+        .recommendation-item strong {
+            flex: 0 0 auto;
+            margin-right: 8px;
+            color: #1e1e1e;
+        }
+        .recommendation-item .server-type {
+            color: #646970;
+            font-size: 12px;
+            margin-right: 12px;
+        }
+        .recommendation-item .recommended-value {
+            margin-left: auto;
+            background: #2271b1;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .recommendation-low .recommended-value {
+            background: #674399;
+        }
+        .recommendation-medium .recommended-value {
+            background: #2271b1;
+        }
+        .recommendation-high .recommended-value {
+            background: #008a20;
+        }
+        .setting-note {
+            color: #646970;
+            font-style: italic;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+    </style>";
 	}
 
 	private function render_text_field($key, $default = '') {
@@ -157,33 +306,34 @@ class MailniagaSettings {
 		return wp_generate_password(32, false);
 	}
 
-	public function render_admin_page() {
-		?>
-        <div class="wrap mailniaga-settings-wrap">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <form action="options.php" method="post" class="mailniaga-settings-form">
-				<?php
-				settings_fields('mailniaga_wp_connector_settings');
-				?>
-                <div class="mailniaga-settings-section">
-					<?php do_settings_sections('mailniaga-smtp'); ?>
-                </div>
-				<?php submit_button('Save Settings', 'mailniaga-submit-button'); ?>
-            </form>
-            <div class="mailniaga-test-email-section">
-                <h2><?php _e('Test Email', 'mailniaga-smtp'); ?></h2>
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="mailniaga-settings-form">
-                    <input type="hidden" name="action" value="mailniaga_send_test_email">
-					<?php wp_nonce_field('mailniaga_test_email', 'mailniaga_test_email_nonce'); ?>
-                    <div class="mailniaga-settings-field">
-                        <label for="test_email"><?php _e('Recipient Email', 'mailniaga-smtp'); ?></label>
-                        <input type="email" id="test_email" name="test_email" value="<?php echo esc_attr(get_option('admin_email')); ?>" required>
-                    </div>
-					<?php submit_button('Send Test Email', 'secondary mailniaga-submit-button', 'send_test_email'); ?>
-                </form>
-            </div>
-        </div>
-		<?php
+	public function sanitize_settings($input) {
+		$sanitized = [];
+
+		// Sanitize main fields
+		if (isset($input['api_key'])) {
+			$sanitized['api_key'] = sanitize_text_field($input['api_key']);
+		}
+		if (isset($input['from_email'])) {
+			$sanitized['from_email'] = sanitize_email($input['from_email']);
+		}
+		if (isset($input['from_name'])) {
+			$sanitized['from_name'] = sanitize_text_field($input['from_name']);
+		}
+		if (isset($input['webhook'])) {
+			$sanitized['webhook'] = sanitize_text_field($input['webhook']);
+		}
+
+		// Sanitize performance fields
+		if (isset($input['concurrency'])) {
+			$concurrency = intval($input['concurrency']);
+			$sanitized['concurrency'] = min(max($concurrency, 1), 500);
+		}
+		if (isset($input['batch_size'])) {
+			$batch_size = intval($input['batch_size']);
+			$sanitized['batch_size'] = min(max($batch_size, 1), 5000);
+		}
+
+		return $sanitized;
 	}
 
 	public function verify_api() {
@@ -219,6 +369,35 @@ class MailniagaSettings {
 		}
 	}
 
+	public function render_admin_page() {
+		?>
+        <div class="wrap mailniaga-settings-wrap">
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            <form action="options.php" method="post" class="mailniaga-settings-form">
+				<?php
+				settings_fields('mailniaga_wp_connector_settings');
+				?>
+                <div class="mailniaga-settings-section">
+					<?php do_settings_sections('mailniaga-smtp'); ?>
+                </div>
+				<?php submit_button('Save Settings', 'mailniaga-submit-button'); ?>
+            </form>
+            <div class="mailniaga-test-email-section">
+                <h2><?php _e('Test Email', 'mailniaga-smtp'); ?></h2>
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="mailniaga-settings-form">
+                    <input type="hidden" name="action" value="mailniaga_send_test_email">
+					<?php wp_nonce_field('mailniaga_test_email', 'mailniaga_test_email_nonce'); ?>
+                    <div class="mailniaga-settings-field">
+                        <label for="test_email"><?php _e('Recipient Email', 'mailniaga-smtp'); ?></label>
+                        <input type="email" id="test_email" name="test_email" value="<?php echo esc_attr(get_option('admin_email')); ?>" required>
+                    </div>
+					<?php submit_button('Send Test Email', 'secondary mailniaga-submit-button', 'send_test_email'); ?>
+                </form>
+            </div>
+        </div>
+		<?php
+	}
+
 	public function add_credit_balance_to_admin_bar($admin_bar) {
 		$credit_balance = get_option('mailniaga_balance', false);
 
@@ -234,7 +413,6 @@ class MailniagaSettings {
 			]);
 		}
 	}
-
 
 	public function add_credit_balance_styles() {
 		echo '<style>
@@ -258,6 +436,11 @@ class MailniagaSettings {
         </style>';
 	}
 
+	/**
+	 * Get the plugin settings
+	 *
+	 * @return array
+	 */
 	public function get_settings() {
 		return $this->settings;
 	}

@@ -12,7 +12,7 @@
  * @wordpress-plugin
  * Plugin Name:         Mail Niaga SMTP
  * Plugin URI:          https://mailniaga.com
- * Version:             2.1.0
+ * Version:             2.2.0
  * Description:         Streamline your WordPress email delivery with Mail Niaga API integration. Boost email deliverability, track performance, and ensure reliable SMTP service for all your website's outgoing emails.
  * Author:              Web Impian
  * Author URI:          https://webimpian.com
