@@ -25,7 +25,6 @@ class MailniagaEmailLog {
 	}
 
 	public function screen_option() {
-		// Add screen options if needed
 	}
 
 	public function enqueue_scripts($hook) {
@@ -86,6 +85,11 @@ class MailniagaEmailLog {
 			echo '<div class="updated"><p>' . sprintf(_n('%s failed email requeued.', '%s failed emails requeued.', $requeued_count, 'mailniaga-smtp'), number_format_i18n($requeued_count)) . '</p></div>';
 		}
 
+		if (isset($_GET['processing_recovered'])) {
+			$recovered_count = intval($_GET['processing_recovered']);
+			echo '<div class="updated"><p>' . sprintf(_n('%s stuck processing email recovered.', '%s stuck processing emails recovered.', $recovered_count, 'mailniaga-smtp'), number_format_i18n($recovered_count)) . '</p></div>';
+		}
+
 		$page = isset($_GET['paged']) ? absint($_GET['paged']) : 1;
 		$status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'all';
 		$from_date = isset($_GET['from_date']) ? sanitize_text_field($_GET['from_date']) : '';
@@ -101,12 +105,12 @@ class MailniagaEmailLog {
         <div class="wrap">
             <h1><?php echo esc_html(__('Mail Niaga Email Log', 'mailniaga-smtp')); ?></h1>
 
-	        <?php
-	        $this->render_filter_tabs($status, $status_counts);
-	        $this->display_auto_delete_notice();
-	        ?>
+			<?php
+			$this->render_filter_tabs($status, $status_counts);
+			$this->display_auto_delete_notice();
+			?>
             <div class="datefilter alignright">
-	            <?php $this->render_date_filter($from_date, $to_date, $search); ?>
+				<?php $this->render_date_filter($from_date, $to_date, $search); ?>
             </div>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" id="email-log-form">
                 <input type="hidden" name="action" value="mailniaga_bulk_action">
@@ -124,9 +128,10 @@ class MailniagaEmailLog {
                     </div>
                     <div>
                         <input type="hidden" name="action" value="mailniaga_bulk_action">
-	                    <?php wp_nonce_field('mailniaga_bulk_action', 'mailniaga_bulk_action_nonce'); ?>
+						<?php wp_nonce_field('mailniaga_bulk_action', 'mailniaga_bulk_action_nonce'); ?>
                         <input type="submit" name="clear_all_logs" class="button action" value="<?php esc_attr_e('Clear All Logs', 'mailniaga-smtp'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to clear all email logs?', 'mailniaga-smtp'); ?>');">
                         <input type="submit" name="resend_all_failed" class="button action" value="<?php esc_attr_e('Resend All Failed', 'mailniaga-smtp'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to resend all failed emails?', 'mailniaga-smtp'); ?>');">
+                        <input type="submit" name="recover_processing" class="button action" value="<?php esc_attr_e('Restart Processing Emails', 'mailniaga-smtp'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to requeue all processing emails?', 'mailniaga-smtp'); ?>');">
                     </div>
                 </div>
 
@@ -148,14 +153,14 @@ class MailniagaEmailLog {
                     </tr>
                     </thead>
                     <tbody>
-                    <?php if (empty($emails)): ?>
+					<?php if (empty($emails)): ?>
                         <tr>
                             <td colspan="8" style="text-align: center;">
                                 <p><?php _e('No email logs found.', 'mailniaga-smtp'); ?></p>
                             </td>
                         </tr>
-                    <?php else: ?>
-                    <?php endif; ?>
+					<?php else: ?>
+					<?php endif; ?>
 					<?php foreach ($emails as $email): ?>
                         <tr>
                             <th scope="row" class="check-column">
@@ -190,6 +195,7 @@ class MailniagaEmailLog {
 			'all' => __('All', 'mailniaga-smtp'),
 			'sent' => __('Sent', 'mailniaga-smtp'),
 			'queued' => __('Queue', 'mailniaga-smtp'),
+			'processing' => __('Processing', 'mailniaga-smtp'),
 			'failed' => __('Failed', 'mailniaga-smtp'),
 		];
 
@@ -223,6 +229,7 @@ class MailniagaEmailLog {
 			'all' => 0,
 			'sent' => 0,
 			'queue' => 0,
+			'processing' => 0,
 			'failed' => 0,
 		];
 
@@ -267,9 +274,11 @@ class MailniagaEmailLog {
 
 		if (!empty($where_clauses)) {
 			$query .= " WHERE " . implode(' AND ', $where_clauses);
+			return $wpdb->get_var($wpdb->prepare($query, $args));
+		} else {
+			// Direct query without prepare when no conditions
+			return $wpdb->get_var($query);
 		}
-
-		return $wpdb->get_var($wpdb->prepare($query, $args));
 	}
 
 	private function get_emails($page, $status = 'all', $from_date = '', $to_date = '', $search = '') {
@@ -427,6 +436,12 @@ class MailniagaEmailLog {
 			exit;
 		}
 
+		if (isset($_POST['recover_processing'])) {
+			$recovered_count = $this->recover_processing_emails();
+			wp_redirect(add_query_arg('processing_recovered', $recovered_count, wp_get_referer()));
+			exit;
+		}
+
 		if (!isset($_POST['email_ids']) || !is_array($_POST['email_ids'])) {
 			wp_redirect(wp_get_referer());
 			exit;
@@ -473,6 +488,18 @@ class MailniagaEmailLog {
 			"UPDATE $table_name SET status = 'queued', error_message = NULL, updated_at = %s WHERE status = 'failed'",
 			current_time('mysql')
 		));
+	}
+
+	private function recover_processing_emails() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'mailniaga_email_queue';
+
+		return $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE $table_name SET status = 'queued', updated_at = %s WHERE status = 'processing'",
+				current_time('mysql')
+			)
+		);
 	}
 
 	private function requeue_emails($email_ids) {
