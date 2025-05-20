@@ -10,9 +10,13 @@ class MailniagaCheckBalance {
 	}
 
 	public function register() {
-		add_filter('cron_schedules', [$this, 'add_cron_interval']);
-		add_action('init', [$this, 'schedule_event']);
+		add_action('init', [$this, 'register_cron_interval'], 20);
+		add_action('init', [$this, 'schedule_event'], 30);
 		add_action('mailniaga_check_balance_hook', [$this, 'check_balance_task']);
+	}
+
+	public function register_cron_interval() {
+		add_filter('cron_schedules', [$this, 'add_cron_interval']);
 	}
 
 	public function add_cron_interval($schedules) {
