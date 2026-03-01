@@ -22,7 +22,7 @@ class MailniagaSettings {
 	}
 
 	public function add_admin_menu() {
-		$icon_url = 'https://demo.dev-aplikasiniaga.com/wp-content/plugins/elementor-mailniaga/mailniaga.png';
+		$icon_url = MAILNIAGA_WP_CONNECTOR['URL'] . 'assets/images/mailniaga.png';
 
 		add_menu_page(
 			__('Mail Niaga SMTP', 'mailniaga-smtp'),
