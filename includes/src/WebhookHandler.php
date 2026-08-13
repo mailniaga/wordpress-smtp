@@ -40,7 +40,8 @@ class WebhookHandler {
 		// connection open, or the sender starts retrying on top of live traffic.
 		$this->respond_ok();
 
-		if ($this->limiter->allow() && isset($data['delivered']) && $data['delivered'] === 'false') {
+		// Only bounces count towards the cap.
+		if (isset($data['delivered']) && $data['delivered'] === 'false' && $this->limiter->allow()) {
 			$this->store_failed_delivery($data);
 		}
 
