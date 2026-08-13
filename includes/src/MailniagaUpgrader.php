@@ -62,7 +62,18 @@ class MailniagaUpgrader {
 			return;
 		}
 
-		if (!function_exists('as_schedule_single_action') || as_next_scheduled_action(self::UPGRADE_HOOK)) {
+		if (!function_exists('as_schedule_single_action') || !function_exists('as_get_scheduled_actions')) {
+			return;
+		}
+
+		// Pending only; as_next_scheduled_action() also counts the running one.
+		$pending = as_get_scheduled_actions([
+			'hook' => self::UPGRADE_HOOK,
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+			'per_page' => 1,
+		], 'ids');
+
+		if (!empty($pending)) {
 			return;
 		}
 
