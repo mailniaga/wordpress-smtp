@@ -4,7 +4,7 @@ Tags: SMTP, email, wp_mail, mailniaga, api, email queue, email log
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -93,6 +93,11 @@ You can find detailed API documentation at [https://api.webimpian.support/mailni
 
 == Changelog ==
 
+= 2.2.5 =
+* Delivery reports from Mail Niaga are handled much faster, reducing server load during large sends
+* Added a safety limit so a sudden burst of reports cannot slow your site down
+* Optional setting for high-volume sites, offered from your dashboard
+
 = 2.2.4 =
 * Improved queue scheduling, significantly reducing server and database load
 * Emails are no longer lost if your credit runs out or the connection drops. Sending pauses, explains why, and resumes automatically
@@ -142,6 +147,9 @@ You can find detailed API documentation at [https://api.webimpian.support/mailni
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.5 =
+Improves how delivery reports are handled, reducing server load during large sends. Recommended for all sites.
 
 = 2.2.4 =
 Important stability and performance update for the email queue. Recommended for all sites.

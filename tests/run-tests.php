@@ -10,9 +10,11 @@ declare(strict_types=1);
 
 require __DIR__ . '/../includes/src/MailniagaRetryPolicy.php';
 require __DIR__ . '/../includes/src/MailniagaSendBudget.php';
+require __DIR__ . '/../includes/src/MailniagaWebhookLimiter.php';
 
 use Webimpian\MailniagaWPConnector\MailniagaRetryPolicy as Policy;
 use Webimpian\MailniagaWPConnector\MailniagaSendBudget as Budget;
+use Webimpian\MailniagaWPConnector\MailniagaWebhookLimiter as Limiter;
 
 $passed = 0;
 $failed = [];
@@ -154,6 +156,21 @@ check('an overlong wave does not fit', $budget->fits(110.0, 5.1), false);
 
 $tiny = new Budget(0.0, 0);
 check('budget is never less than a second', $tiny->remaining(0.0), 1.0);
+
+// --------------------------------------------------------- webhook limiter --
+
+check('a fresh minute is under the cap', Limiter::exceeded(1, 120), false);
+check('exactly at the cap is allowed', Limiter::exceeded(120, 120), false);
+check('one past the cap is not', Limiter::exceeded(121, 120), true);
+check('far past the cap is not', Limiter::exceeded(5000, 120), true);
+check('a cap of one still works', Limiter::exceeded(2, 1), true);
+
+// Buckets are per-minute, so a burst cannot borrow capacity from the last one.
+$minute = 1000000 - (1000000 % 60);
+check('start of the minute', Limiter::bucket($minute) === Limiter::bucket($minute), true);
+check('same minute shares a bucket', Limiter::bucket($minute) === Limiter::bucket($minute + 59), true);
+check('next minute gets its own', Limiter::bucket($minute) === Limiter::bucket($minute + 60), false);
+check('bucket is a UTC minute stamp', strlen(Limiter::bucket($minute)), 12);
 
 // ------------------------------------------------------------------ report --
 

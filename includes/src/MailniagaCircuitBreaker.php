@@ -69,7 +69,7 @@ class MailniagaCircuitBreaker {
 			human_time_diff(time(), $this->resumes_at())
 		);
 
-		printf('<div class="notice notice-warning"><p>%s</p></div>', esc_html($message));
+		MailniagaNotice::render(__('Email sending is paused', 'mailniaga-smtp'), $message, null, 'warning');
 	}
 
 	private function state(): ?array {

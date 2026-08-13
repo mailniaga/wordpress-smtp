@@ -15,6 +15,7 @@ class MailniagaConnector {
 	private MailniagaOrphanLogCleaner $orphan_log_cleaner;
 	private MailniagaUpgrader $upgrader;
 	private MailniagaCircuitBreaker $circuit_breaker;
+	private MailniagaDropin $dropin;
 
 	private MailniagaRecoveryManager $recovery_manager;
 
@@ -32,6 +33,7 @@ class MailniagaConnector {
 		$this->orphan_log_cleaner = new MailniagaOrphanLogCleaner();
 		$this->upgrader = new MailniagaUpgrader();
 		$this->circuit_breaker = new MailniagaCircuitBreaker();
+		$this->dropin = new MailniagaDropin();
 		$this->recovery_manager = new MailniagaRecoveryManager();
 	}
 
@@ -55,6 +57,7 @@ class MailniagaConnector {
 		$this->orphan_log_cleaner->register();
 		$this->upgrader->register();
 		$this->circuit_breaker->register();
+		$this->dropin->register();
 		$this->recovery_manager->register();
 
 		add_action('admin_post_mailniaga_send_test_email', [$this, 'handle_test_email']);

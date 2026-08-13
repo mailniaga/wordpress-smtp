@@ -27,9 +27,11 @@ class MailniagaOrphanLogCleaner {
 		}
 
 		if (get_option(self::RUNNING_OPTION)) {
-			printf(
-				'<div class="notice notice-info"><p>%s</p></div>',
-				esc_html__('Mail Niaga is clearing orphaned scheduler logs in the background. This page will stop showing once it finishes.', 'mailniaga-smtp')
+			MailniagaNotice::render(
+				__('Cleaning up in the background', 'mailniaga-smtp'),
+				__('Mail Niaga is clearing old scheduler records. This message disappears once it finishes.', 'mailniaga-smtp'),
+				null,
+				'busy'
 			);
 			return;
 		}
@@ -44,11 +46,14 @@ class MailniagaOrphanLogCleaner {
 			number_format_i18n($this->estimated_orphans())
 		);
 
-		echo '<div class="notice notice-warning"><p>' . esc_html($message) . '</p><p>';
-		$this->render_button('mailniaga_purge_orphans', __('Clean up now', 'mailniaga-smtp'), 'button button-primary');
-		echo ' ';
-		$this->render_button('mailniaga_dismiss_orphans', __('Dismiss', 'mailniaga-smtp'), 'button');
-		echo '</p></div>';
+		MailniagaNotice::render(
+			__('Free up database space', 'mailniaga-smtp'),
+			$message,
+			function () {
+				MailniagaNotice::button('mailniaga_purge_orphans', __('Clean up now', 'mailniaga-smtp'), 'button button-primary');
+				MailniagaNotice::button('mailniaga_dismiss_orphans', __('No thanks', 'mailniaga-smtp'), 'button');
+			}
+		);
 	}
 
 	public function handle_start(): void {
@@ -135,14 +140,4 @@ class MailniagaOrphanLogCleaner {
 		return (int) $rows;
 	}
 
-	private function render_button(string $action, string $label, string $class): void {
-		printf(
-			'<form method="post" action="%s" style="display:inline">%s<input type="hidden" name="action" value="%s"><button type="submit" class="%s">%s</button></form>',
-			esc_url(admin_url('admin-post.php')),
-			wp_nonce_field($action, '_wpnonce', true, false),
-			esc_attr($action),
-			esc_attr($class),
-			esc_html($label)
-		);
-	}
 }
