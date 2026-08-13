@@ -7,22 +7,27 @@ namespace Composer\Autoload;
 class ComposerStaticInit8243bf438a6bf7fdbf37249bb6218f03
 {
     public static $files = array (
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'W' => 
+        'W' =>
         array (
             'Webimpian\\MailniagaWPConnector\\' => 31,
         ),
-        'P' => 
+        'S' =>
+        array (
+            'Symfony\\Polyfill\\Php80\\' => 23,
+        ),
+        'P' =>
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
@@ -31,28 +36,32 @@ class ComposerStaticInit8243bf438a6bf7fdbf37249bb6218f03
     );
 
     public static $prefixDirsPsr4 = array (
-        'Webimpian\\MailniagaWPConnector\\' => 
+        'Webimpian\\MailniagaWPConnector\\' =>
         array (
             0 => __DIR__ . '/../../..' . '/includes/src',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Symfony\\Polyfill\\Php80\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
+        ),
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'GuzzleHttp\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'GuzzleHttp\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
@@ -96,13 +105,16 @@ class ComposerStaticInit8243bf438a6bf7fdbf37249bb6218f03
         'ActionScheduler_OptionLock' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_OptionLock.php',
         'ActionScheduler_QueueCleaner' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_QueueCleaner.php',
         'ActionScheduler_QueueRunner' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_QueueRunner.php',
+        'ActionScheduler_RecurringActionScheduler' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_RecurringActionScheduler.php',
         'ActionScheduler_Schedule' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/schedules/ActionScheduler_Schedule.php',
         'ActionScheduler_SimpleSchedule' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/schedules/ActionScheduler_SimpleSchedule.php',
         'ActionScheduler_Store' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/abstracts/ActionScheduler_Store.php',
         'ActionScheduler_StoreSchema' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/schema/ActionScheduler_StoreSchema.php',
+        'ActionScheduler_SystemInformation' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_SystemInformation.php',
         'ActionScheduler_TimezoneHelper' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/abstracts/ActionScheduler_TimezoneHelper.php',
         'ActionScheduler_Versions' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_Versions.php',
         'ActionScheduler_WPCLI_Clean_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/ActionScheduler_WPCLI_Clean_Command.php',
+        'ActionScheduler_WPCLI_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/abstracts/ActionScheduler_WPCLI_Command.php',
         'ActionScheduler_WPCLI_QueueRunner' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/ActionScheduler_WPCLI_QueueRunner.php',
         'ActionScheduler_WPCLI_Scheduler_command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/ActionScheduler_WPCLI_Scheduler_command.php',
         'ActionScheduler_WPCommentCleaner' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/ActionScheduler_WPCommentCleaner.php',
@@ -121,9 +133,24 @@ class ComposerStaticInit8243bf438a6bf7fdbf37249bb6218f03
         'Action_Scheduler\\Migration\\LogMigrator' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/migration/LogMigrator.php',
         'Action_Scheduler\\Migration\\Runner' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/migration/Runner.php',
         'Action_Scheduler\\Migration\\Scheduler' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/migration/Scheduler.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Cancel_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Cancel_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Create_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Create_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Delete_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Delete_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Generate_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Generate_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Get_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Get_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\List_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/List_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Next_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Next_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action\\Run_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action/Run_Command.php',
+        'Action_Scheduler\\WP_CLI\\Action_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Action_Command.php',
         'Action_Scheduler\\WP_CLI\\Migration_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/Migration_Command.php',
         'Action_Scheduler\\WP_CLI\\ProgressBar' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/ProgressBar.php',
+        'Action_Scheduler\\WP_CLI\\System_Command' => __DIR__ . '/..' . '/woocommerce/action-scheduler/classes/WP_CLI/System_Command.php',
+        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

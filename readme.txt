@@ -2,9 +2,9 @@
 Contributors: webimpian
 Tags: SMTP, email, wp_mail, mailniaga, api, email queue, email log
 Requires at least: 5.6
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.3
+Stable tag: 2.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -93,6 +93,17 @@ You can find detailed API documentation at [https://api.webimpian.support/mailni
 
 == Changelog ==
 
+= 2.2.4 =
+* Improved queue scheduling, significantly reducing server and database load
+* Emails are no longer lost if your credit runs out or the connection drops. Sending pauses, explains why, and resumes automatically
+* Emails that cannot be delivered now stop after 3 attempts, instead of being retried forever
+* Faster queue and webhook processing with new database indexes
+* Emails interrupted while sending go back to the queue instead of getting stuck
+* Reduced database growth from scheduled task logs, with a one-click cleanup for existing sites
+* Simpler performance settings, with clearer guidance on sending speed
+* A high Concurrency setting is lowered on update. You can change it again in Settings
+* Updated bundled libraries, including security updates
+
 = 2.2.3 =
 * Migrated admin menu icon to local plugin assets instead of external URL
 
@@ -131,6 +142,9 @@ You can find detailed API documentation at [https://api.webimpian.support/mailni
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.4 =
+Important stability and performance update for the email queue. Recommended for all sites.
 
 = 2.0.0 =
 Major update with full API integration, email queue system, comprehensive logging, and various UI improvements. Please backup your site before upgrading.

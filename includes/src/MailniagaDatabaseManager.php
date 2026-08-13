@@ -23,10 +23,14 @@ class MailniagaDatabaseManager {
             headers text,
             attachments text,
             status varchar(20) NOT NULL DEFAULT 'queued',
+            attempts tinyint(3) unsigned NOT NULL DEFAULT 0,
             error_message text,
             created_at datetime NOT NULL,
             updated_at datetime,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            KEY status_created (status, created_at),
+            KEY status_updated (status, updated_at),
+            KEY created_at (created_at)
         ) $charset_collate;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -53,7 +57,8 @@ class MailniagaDatabaseManager {
             created_at datetime NOT NULL,
             unsubscribed tinyint(1) NOT NULL DEFAULT 0,
             PRIMARY KEY (id),
-            KEY email_id (email_id)
+            KEY email_id (email_id),
+            KEY to_email (to_email)
         ) $charset_collate;";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

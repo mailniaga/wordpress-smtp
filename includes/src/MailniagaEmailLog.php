@@ -485,7 +485,7 @@ class MailniagaEmailLog {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mailniaga_email_queue';
 		return $wpdb->query($wpdb->prepare(
-			"UPDATE $table_name SET status = 'queued', error_message = NULL, updated_at = %s WHERE status = 'failed'",
+			"UPDATE $table_name SET status = 'queued', attempts = 0, error_message = NULL, updated_at = %s WHERE status = 'failed'",
 			current_time('mysql')
 		));
 	}
@@ -508,7 +508,7 @@ class MailniagaEmailLog {
 
 		$placeholders = implode(', ', array_fill(0, count($email_ids), '%d'));
 		$query = $wpdb->prepare(
-			"UPDATE $table_name SET status = 'queued', error_message = NULL, updated_at = %s WHERE id IN ($placeholders) AND status = 'failed'",
+			"UPDATE $table_name SET status = 'queued', attempts = 0, error_message = NULL, updated_at = %s WHERE id IN ($placeholders) AND status = 'failed'",
 			current_time('mysql'),
 			...$email_ids
 		);

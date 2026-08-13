@@ -127,7 +127,7 @@ class MailniagaSettings {
 
 	public function render_performance_section_description() {
 		echo '<div class="notice notice-warning inline">';
-		echo '<p>' . __('These settings control how emails are processed and sent. Higher values can speed up email sending but may use more server resources. If you experience server issues, try lowering these values.', 'mailniaga-smtp') . '</p>';
+		echo '<p>' . __('These control how fast your queued emails are sent. The limit is usually not your server, but Gmail, Yahoo and others slowing down senders who go too fast. If mail is being delayed or your server is struggling, lower Concurrency.', 'mailniaga-smtp') . '</p>';
 		echo '</div>';
 	}
 
@@ -153,54 +153,54 @@ class MailniagaSettings {
 	}
 
 	public function concurrency_callback() {
-		$value = $this->settings['concurrency'] ?? 100;
-		echo "<input type='number' name='mailniaga_wp_connector_settings[concurrency]' value='" . esc_attr($value) . "' class='small-text' min='1' max='500'>";
+		$value = $this->settings['concurrency'] ?? 5;
+		echo "<input type='number' name='mailniaga_wp_connector_settings[concurrency]' value='" . esc_attr($value) . "' class='small-text' min='1' max='25'>";
 		echo "<div class='description mailniaga-setting-description'>";
-		echo "<p class='setting-intro'>" . __('How many emails to send at the same time. Higher values send emails faster but use more server resources:', 'mailniaga-smtp') . "</p>";
+		echo "<p class='setting-intro'>" . __('How many emails to send at once. This controls your sending speed:', 'mailniaga-smtp') . "</p>";
 		echo "<div class='mailniaga-recommendations'>";
 		echo "<div class='recommendation-item recommendation-low'>";
-		echo "<strong>" . __('Low Server Resources', 'mailniaga-smtp') . "</strong>";
-		echo "<span class='server-type'>" . __('(Shared Hosting)', 'mailniaga-smtp') . "</span>";
-		echo "<span class='recommended-value'>" . __('Use 20-50', 'mailniaga-smtp') . "</span>";
+		echo "<strong>" . __('Slow and safe', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(shared hosting, or a new domain)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 1-5', 'mailniaga-smtp') . "</span>";
 		echo "</div>";
 		echo "<div class='recommendation-item recommendation-medium'>";
-		echo "<strong>" . __('Medium Server Resources', 'mailniaga-smtp') . "</strong>";
-		echo "<span class='server-type'>" . __('(VPS)', 'mailniaga-smtp') . "</span>";
-		echo "<span class='recommended-value'>" . __('Use 50-200', 'mailniaga-smtp') . "</span>";
+		echo "<strong>" . __('Normal', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(VPS, domain you send from often)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 5-10', 'mailniaga-smtp') . "</span>";
 		echo "</div>";
 		echo "<div class='recommendation-item recommendation-high'>";
-		echo "<strong>" . __('High Server Resources', 'mailniaga-smtp') . "</strong>";
-		echo "<span class='server-type'>" . __('(Dedicated)', 'mailniaga-smtp') . "</span>";
-		echo "<span class='recommended-value'>" . __('Use 200-500', 'mailniaga-smtp') . "</span>";
+		echo "<strong>" . __('Fast', 'mailniaga-smtp') . "</strong>";
+		echo "<span class='server-type'>" . __('(strong server, trusted domain)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 10-25', 'mailniaga-smtp') . "</span>";
 		echo "</div>";
 		echo "</div>";
-		echo "<p class='setting-note'>" . __('Default: 100. If unsure, start low and increase gradually while monitoring server performance.', 'mailniaga-smtp') . "</p>";
+		echo "<p class='setting-note'>" . __('Default: 5. Gmail and Yahoo slow you down if you send too fast. If bounces mention "deferred" or "unexpected volume", use a lower number.', 'mailniaga-smtp') . "</p>";
 		echo "</div>";
 	}
 
 	public function batch_size_callback() {
-		$value = $this->settings['batch_size'] ?? 100;
-		echo "<input type='number' name='mailniaga_wp_connector_settings[batch_size]' value='" . esc_attr($value) . "' class='small-text' min='1' max='5000'>";
+		$value = $this->settings['batch_size'] ?? 50;
+		echo "<input type='number' name='mailniaga_wp_connector_settings[batch_size]' value='" . esc_attr($value) . "' class='small-text' min='1' max='250'>";
 		echo "<div class='description mailniaga-setting-description'>";
-		echo "<p class='setting-intro'>" . __('How many emails to pull from the queue at once. Higher values mean fewer database queries but more memory usage:', 'mailniaga-smtp') . "</p>";
+		echo "<p class='setting-intro'>" . __('How many emails to read from the queue at once. This affects memory, not speed:', 'mailniaga-smtp') . "</p>";
 		echo "<div class='mailniaga-recommendations'>";
 		echo "<div class='recommendation-item recommendation-low'>";
 		echo "<strong>" . __('Low Memory', 'mailniaga-smtp') . "</strong>";
 		echo "<span class='server-type'>" . __('(< 2GB)', 'mailniaga-smtp') . "</span>";
-		echo "<span class='recommended-value'>" . __('Use 50-100', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 25-50', 'mailniaga-smtp') . "</span>";
 		echo "</div>";
 		echo "<div class='recommendation-item recommendation-medium'>";
 		echo "<strong>" . __('Medium Memory', 'mailniaga-smtp') . "</strong>";
-		echo "<span class='server-type'>" . __('(5GB-20GB)', 'mailniaga-smtp') . "</span>";
-		echo "<span class='recommended-value'>" . __('Use 100-1000', 'mailniaga-smtp') . "</span>";
+		echo "<span class='server-type'>" . __('(2GB-8GB)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 50-100', 'mailniaga-smtp') . "</span>";
 		echo "</div>";
 		echo "<div class='recommendation-item recommendation-high'>";
 		echo "<strong>" . __('High Memory', 'mailniaga-smtp') . "</strong>";
-		echo "<span class='server-type'>" . __('(> 20GB)', 'mailniaga-smtp') . "</span>";
-		echo "<span class='recommended-value'>" . __('Use 1000-5000', 'mailniaga-smtp') . "</span>";
+		echo "<span class='server-type'>" . __('(> 8GB)', 'mailniaga-smtp') . "</span>";
+		echo "<span class='recommended-value'>" . __('Use 100-250', 'mailniaga-smtp') . "</span>";
 		echo "</div>";
 		echo "</div>";
-		echo "<p class='setting-note'>" . __('Default: 100. If you see memory errors, reduce this value.', 'mailniaga-smtp') . "</p>";
+		echo "<p class='setting-note'>" . __('Default: 50. Use less if your emails have big attachments. To send faster, change Concurrency.', 'mailniaga-smtp') . "</p>";
 		echo "</div>";
 	}
 
@@ -324,13 +324,15 @@ class MailniagaSettings {
 		}
 
 		// Sanitize performance fields
+		// Must match the caps in MailniagaEmailSender, or the page reports a
+		// value the sender will not use.
 		if (isset($input['concurrency'])) {
 			$concurrency = intval($input['concurrency']);
-			$sanitized['concurrency'] = min(max($concurrency, 1), 500);
+			$sanitized['concurrency'] = min(max($concurrency, 1), 25);
 		}
 		if (isset($input['batch_size'])) {
 			$batch_size = intval($input['batch_size']);
-			$sanitized['batch_size'] = min(max($batch_size, 1), 5000);
+			$sanitized['batch_size'] = min(max($batch_size, 1), 250);
 		}
 
 		return $sanitized;

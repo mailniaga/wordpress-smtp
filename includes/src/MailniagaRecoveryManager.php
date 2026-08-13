@@ -3,6 +3,12 @@
 namespace Webimpian\MailniagaWPConnector;
 
 class MailniagaRecoveryManager {
+	/** Must exceed the longest a send run can take, or in-flight mail is resent. */
+	private const STALE_MINUTES = 30;
+
+	private const INTERVAL = 900;
+	private const BATCH_SIZE = 500;
+
 	public function register() {
 		add_action('init', [$this, 'schedule_recovery']);
 		add_action('mailniaga_recover_stale', [$this, 'recover_stale_processing_emails']);
@@ -10,8 +16,7 @@ class MailniagaRecoveryManager {
 
 	public function schedule_recovery() {
 		if (!as_next_scheduled_action('mailniaga_recover_stale')) {
-			as_schedule_recurring_action(time(), 10, 'mailniaga_recover_stale');
-			error_log('Scheduled mailniaga_recover_stale');
+			as_schedule_recurring_action(time() + self::INTERVAL, self::INTERVAL, 'mailniaga_recover_stale');
 		}
 	}
 
@@ -19,31 +24,30 @@ class MailniagaRecoveryManager {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'mailniaga_email_queue';
 
-		$stale_threshold_minutes = 10;
+		$minutes = max(1, (int) apply_filters('mailniaga_stale_minutes', self::STALE_MINUTES));
 
-		$stale_emails = $wpdb->get_results(
+		$stale_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT id FROM $table_name 
-                WHERE status = 'processing' 
-                AND updated_at < DATE_SUB(NOW(), INTERVAL %d MINUTE)",
-				$stale_threshold_minutes
+				"SELECT id FROM $table_name
+				 WHERE status = 'processing'
+				 AND updated_at < DATE_SUB(NOW(), INTERVAL %d MINUTE)
+				 LIMIT %d",
+				$minutes,
+				self::BATCH_SIZE
 			)
 		);
 
-		if (empty($stale_emails)) {
+		if (empty($stale_ids)) {
 			return;
 		}
 
-		$email_ids = array_map(function($email) {
-			return $email->id;
-		}, $stale_emails);
+		$ids = implode(',', array_map('intval', $stale_ids));
 
-		$ids = implode(',', array_map('intval', $email_ids));
-		$wpdb->query("UPDATE $table_name 
-            SET status = 'queued', 
-                updated_at = '" . current_time('mysql') . "' 
-            WHERE id IN ($ids)");
-
-		error_log("MailNiaga: Recovered " . count($email_ids) . " stale processing emails");
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE $table_name SET status = 'queued', updated_at = %s WHERE id IN ($ids)",
+				current_time('mysql')
+			)
+		);
 	}
 }

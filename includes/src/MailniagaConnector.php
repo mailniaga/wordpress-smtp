@@ -12,7 +12,9 @@ class MailniagaConnector {
 	private MailniagaFailedDeliveriesLog $failed_deliveries_log;
 	private MailniagaEmailLogCleaner $email_log_cleaner;
 	private MailniagaCheckBalance $check_balance;
-	private MailniagaActionSchedulerCleaner $action_scheduler_cleaner;
+	private MailniagaOrphanLogCleaner $orphan_log_cleaner;
+	private MailniagaUpgrader $upgrader;
+	private MailniagaCircuitBreaker $circuit_breaker;
 
 	private MailniagaRecoveryManager $recovery_manager;
 
@@ -27,7 +29,9 @@ class MailniagaConnector {
 		$this->failed_deliveries_log = new MailniagaFailedDeliveriesLog();
 		$this->email_log_cleaner = new MailniagaEmailLogCleaner();
 		$this->check_balance = new MailniagaCheckBalance($this->settings);
-		$this->action_scheduler_cleaner = new MailniagaActionSchedulerCleaner();
+		$this->orphan_log_cleaner = new MailniagaOrphanLogCleaner();
+		$this->upgrader = new MailniagaUpgrader();
+		$this->circuit_breaker = new MailniagaCircuitBreaker();
 		$this->recovery_manager = new MailniagaRecoveryManager();
 	}
 
@@ -48,7 +52,9 @@ class MailniagaConnector {
 		$this->failed_deliveries_log->register();
 		$this->email_log_cleaner->register();
 		$this->check_balance->register();
-		$this->action_scheduler_cleaner->register();
+		$this->orphan_log_cleaner->register();
+		$this->upgrader->register();
+		$this->circuit_breaker->register();
 		$this->recovery_manager->register();
 
 		add_action('admin_post_mailniaga_send_test_email', [$this, 'handle_test_email']);
