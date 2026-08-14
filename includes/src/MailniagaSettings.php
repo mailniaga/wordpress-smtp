@@ -375,7 +375,7 @@ class MailniagaSettings {
 								printf(
 									/* translators: %s: link to the Mail Niaga dashboard. */
 									esc_html__('Find your key in the %s.', 'mailniaga-smtp'),
-									'<a href="https://gateway.mailniaga.com" target="_blank" rel="noopener">' . esc_html__('Mail Niaga dashboard', 'mailniaga-smtp') . '</a>'
+									'<a href="https://gateway.mailniaga.mx" target="_blank" rel="noopener">' . esc_html__('Mail Niaga dashboard', 'mailniaga-smtp') . '</a>'
 								);
 							?></p>
 							<?php $this->api_key_callback(); ?>
@@ -482,7 +482,7 @@ class MailniagaSettings {
 						</header>
 						<ul class="mn-links">
 							<li><a href="https://api.webimpian.support/mailniaga" target="_blank" rel="noopener"><?php esc_html_e('API documentation', 'mailniaga-smtp'); ?></a></li>
-							<li><a href="https://gateway.mailniaga.com" target="_blank" rel="noopener"><?php esc_html_e('Manage your account', 'mailniaga-smtp'); ?></a></li>
+							<li><a href="https://gateway.mailniaga.mx" target="_blank" rel="noopener"><?php esc_html_e('Manage your account', 'mailniaga-smtp'); ?></a></li>
 							<li><a href="mailto:support@mailniaga.com">support@mailniaga.com</a></li>
 						</ul>
 					</section>

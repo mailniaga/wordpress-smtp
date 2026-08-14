@@ -4,7 +4,7 @@ Tags: SMTP, email, wp_mail, mailniaga, api, email queue, email log
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.7
+Stable tag: 2.2.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -92,6 +92,9 @@ This plugin is specifically designed for Mail Niaga, a product of Web Impian Sdn
 You can find detailed API documentation at [https://api.webimpian.support/mailniaga](https://api.webimpian.support/mailniaga). This resource provides comprehensive information on how to use the Mail Niaga API effectively.
 
 == Changelog ==
+
+= 2.2.8 =
+* Updated dashboard links to the correct Mail Niaga address
 
 = 2.2.7 =
 * Fixed the automatic scheduler-record cleanup not removing records on some database versions
