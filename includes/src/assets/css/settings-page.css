@@ -1,213 +1,711 @@
-/* Mailniaga WP Connector Settings Page Styles */
+/* Mail Niaga SMTP settings page. */
 
-:root {
-    --primary-yellow: #FFD700;
-    --black: #000000;
-    --light-beige: #FFF8E7;
-    --white: #FFFFFF;
-    --light-blue: #F0F8FF;
-    --dark-gray: #333333;
+.mn-wrap {
+	--mn-ink: #171c22;
+	--mn-ink-2: #4b5560;
+	--mn-ink-3: #7b8590;
+	--mn-gold: #f5b70a;
+	--mn-gold-soft: #fdf3d7;
+	--mn-paper: #ffffff;
+	--mn-ground: #f6f7f8;
+	--mn-line: #e2e5e9;
+	--mn-radius: 10px;
+
+	margin-right: 20px;
 }
 
-.regular-text{
-    width: 600px !important;
+.mn-wrap,
+.mn-wrap p {
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--mn-ink-2);
 }
 
-.mailniaga-settings-wrap {
-    margin: 20px auto;
-    background: var(--white);
-    border-radius: 8px;
-    font-family: Poppins, sans-serif;
+/* ---------- hero ---------- */
+
+.mn-hero {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px 32px;
+	margin: 20px 0 24px;
+	padding: 26px 28px 24px;
+	background:
+		radial-gradient(ellipse 60% 90% at 78% 10%, rgba(245, 183, 10, 0.22), transparent 60%),
+		radial-gradient(ellipse 50% 80% at 15% 100%, rgba(163, 132, 30, 0.14), transparent 60%),
+		#191a15;
+	border-radius: var(--mn-radius);
+	overflow: hidden;
 }
 
-.mailniaga-settings-wrap h1 {
-    background: var(--primary-yellow);
-    color: var(--black);
-    padding: 20px;
-    margin: 0;
-    border-radius: 8px 8px 0 0;
-    font-size: 24px;
-    font-weight: bold;
+.mn-hero-brand {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	min-width: 0;
 }
 
-.mailniaga-settings-form {
-    padding: 30px;
+.mn-hero-mark {
+	display: grid;
+	place-items: center;
+	width: 52px;
+	height: 52px;
+	background: #fff;
+	border-radius: 12px;
+	flex: none;
 }
 
-.mailniaga-settings-section {
-    /*background: var(--light-beige);*/
-    border: 1px solid #e5e5e5;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 5px;
+.mn-wrap .mn-hero-title {
+	margin: 0;
+	font-size: 19px;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	color: #fff;
 }
 
-.mailniaga-settings-section h2 {
-    margin-top: 0;
-    color: var(--black);
-    font-size: 20px;
-    margin-bottom: 20px;
+.mn-hero-title .mn-gold-word {
+	color: #f7c827;
 }
 
-.mailniaga-settings-field {
-    margin-bottom: 20px;
+.mn-wrap .mn-hero-sub {
+	margin: 2px 0 0;
+	color: #a8ab9e;
 }
 
-.mailniaga-settings-field label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: var(--dark-gray);
+.mn-chip {
+	display: inline-block;
+	margin-left: 8px;
+	padding: 2px 9px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: #191a15;
+	background: #f7c827;
+	border-radius: 7px;
+	vertical-align: 2px;
 }
 
-.mailniaga-settings-field input[type="text"],
-.mailniaga-settings-field input[type="email"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+.mn-hero-stats {
+	display: flex;
+	gap: 36px;
 }
 
-.mailniaga-submit-button {
-    background: var(--primary-yellow);
-    color: var(--black);
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.1s ease;
-    border-radius: 4px;
-    text-transform: uppercase;
+.mn-stat {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
 }
 
-.mailniaga-submit-button:hover {
-    background: #FFE44D;
-    transform: translateY(-2px);
+.mn-stat-value {
+	font-size: 24px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.02em;
+	color: #fff;
 }
 
-.mailniaga-submit-button:active {
-    transform: translateY(0);
+.mn-stat-gold {
+	color: #f7c827;
 }
 
-.mailniaga-test-email-section {
-    border-top: 2px solid var(--light-beige);
-    padding-top: 30px;
+.mn-stat-label {
+	font-size: 11px;
+	font-weight: 650;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #8b8e83;
 }
 
-.mailniaga-test-email-section h2 {
-    padding: 0 30px;
-    padding-bottom: 0px!important;
-    color: var(--black);
-    font-size: 20px;
-    margin-bottom: 20px;
+/* ---------- layout ---------- */
+
+.mn-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 360px;
+	gap: 20px;
+	align-items: start;
 }
 
-/* Additional styles for better UX */
-.mailniaga-settings-field input[type="text"]:focus,
-.mailniaga-settings-field input[type="email"]:focus {
-    outline: none;
-    border-color: var(--primary-yellow);
-    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+.mn-main,
+.mn-side {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	min-width: 0;
 }
 
-.mailniaga-settings-description {
-    font-size: 14px;
-    color: #666;
-    margin-top: 5px;
+@media (max-width: 1100px) {
+	.mn-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
-.datetime-wrapper {
-    display: inline-block;
-    margin-right: 10px;
+/* ---------- cards ---------- */
+
+.mn-card {
+	background: var(--mn-paper);
+	border: 1px solid var(--mn-line);
+	border-radius: var(--mn-radius);
+	padding: 22px 24px;
+	animation: mn-rise 0.35s ease both;
 }
 
-.date-picker {
-    width: 100px;
-    margin-right: 5px;
+.mn-card:nth-child(2) { animation-delay: 0.04s; }
+.mn-card:nth-child(3) { animation-delay: 0.08s; }
+.mn-card:nth-child(4) { animation-delay: 0.12s; }
+
+@keyframes mn-rise {
+	from { opacity: 0; transform: translateY(6px); }
+	to { opacity: 1; transform: none; }
 }
 
-.time-picker {
-    width: 100px;
+@media (prefers-reduced-motion: reduce) {
+	.mn-card { animation: none; }
 }
 
-/* API Verification Styles */
-#api-verification-results {
-    background: var(--light-beige);
-    border: 1px solid #e5e5e5;
-    padding: 0 20px;
-    margin-top: 30px;
-    width:560px;
-    border-radius: 5px;
+.mn-card-quiet {
+	background: var(--mn-ground);
 }
 
-#api-verification-results h3 {
-    margin-top: 0;
-    color: var(--black);
-    font-size: 20px;
-    margin-bottom: 20px;
+.mn-card-head {
+	margin-bottom: 18px;
 }
 
-#api-details .mailniaga-settings-field {
-    background: var(--white);
-    padding: 15px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.mn-card-title {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	color: var(--mn-ink);
 }
 
-#api-details p {
-    margin: 10px 0;
-    font-size: 14px;
-    color: var(--dark-gray);
+.mn-card-note {
+	margin: 6px 0 0;
+	color: var(--mn-ink-3);
 }
 
-#api-details{
-    display: flex;
-    flex-direction: row;
-    column-gap: 20px;
-    flex-wrap: wrap;
+/* ---------- fields ---------- */
+
+.mn-field {
+	margin-bottom: 16px;
 }
 
-#api-details p strong {
-    font-weight: bold;
-    color: var(--black);
+.mn-field:last-child {
+	margin-bottom: 0;
 }
 
-#verify-api {
-margin-left:10px;
+.mn-field-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
 }
 
-#verify-api:hover {
-    background: #FFE44D;
-    transform: translateY(-2px);
-}
-
-#verify-api:active {
-    transform: translateY(0);
-}
-
-#verify-api:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-.button-secondary{
-    margin-top: 0px !important;
-}
-
-
-/* Responsive adjustments */
 @media (max-width: 600px) {
-    .mailniaga-settings-wrap {
-        margin: 10px;
-    }
+	.mn-field-row {
+		grid-template-columns: 1fr;
+	}
+}
 
-    .mailniaga-settings-form {
-        padding: 20px;
-    }
+.mn-label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--mn-ink);
+}
 
-    .mailniaga-submit-button {
-        width: 100%;
-    }
+.mn-wrap .mn-input {
+	width: 100%;
+	max-width: 100%;
+	padding: 7px 12px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--mn-ink);
+	background: var(--mn-paper);
+	border: 1px solid var(--mn-line);
+	border-radius: 6px;
+	box-shadow: none;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mn-wrap .mn-input:focus {
+	border-color: var(--mn-gold);
+	box-shadow: 0 0 0 2px rgba(245, 183, 10, 0.25);
+	outline: none;
+}
+
+.mn-wrap .mn-input[readonly] {
+	background: var(--mn-ground);
+	color: var(--mn-ink-2);
+}
+
+.mn-input-mono {
+	font-family: Menlo, Consolas, monaco, monospace;
+	font-size: 12px !important;
+}
+
+.mn-wrap .mn-input-num {
+	width: 84px;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+}
+
+.mn-input-group {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.mn-input-group .mn-input {
+	flex: 1;
+}
+
+.mn-input-group .button {
+	flex: none;
+}
+
+.mn-hint {
+	margin: 6px 0 0;
+	font-size: 12px;
+	color: var(--mn-ink-3);
+}
+
+.mn-hint a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.mn-hint a:hover {
+	color: var(--mn-ink);
+}
+
+.mn-callback-url code {
+	display: inline-block;
+	max-width: 100%;
+	overflow-wrap: anywhere;
+	padding: 3px 6px;
+	background: var(--mn-ground);
+	border-radius: 4px;
+	font-size: 11px;
+}
+
+/* ---------- verify status + account details ---------- */
+
+.mn-status {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin: 10px 0 0;
+	padding: 9px 12px;
+	border-radius: 8px;
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.mn-status::before {
+	font-weight: 700;
+	flex: 0 0 auto;
+}
+
+.mn-status-ok {
+	background: #eef9f0;
+	border: 1px solid #cdeed5;
+	color: #1a7331;
+}
+
+.mn-status-ok::before {
+	content: "\2713";
+}
+
+.mn-status-error {
+	background: #fdf0ef;
+	border: 1px solid #f3d0cc;
+	color: #b32d2e;
+}
+
+.mn-status-error::before {
+	content: "\2715";
+}
+
+.mn-status-busy {
+	background: #f6f7f7;
+	border: 1px solid #e2e4e7;
+	color: var(--mn-ink-3);
+}
+
+.mn-account {
+	margin-top: 10px;
+	padding: 14px 16px;
+	background: var(--mn-gold-soft);
+	border: 1px solid #f0dfa8;
+	border-radius: 8px;
+}
+
+.mn-account-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.mn-account-table th {
+	padding: 5px 0;
+	text-align: left;
+	font-weight: 600;
+	color: var(--mn-ink-2);
+}
+
+.mn-account-table td {
+	padding: 5px 0;
+	text-align: right;
+	color: var(--mn-ink-2);
+	font-variant-numeric: tabular-nums;
+}
+
+.mn-wrap .mn-hint-top {
+	margin: -2px 0 8px;
+}
+
+/* ---------- sending speed ---------- */
+
+.mn-field-speed + .mn-field-speed {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid var(--mn-line);
+}
+
+.mn-speed-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+}
+
+.mn-speed-head .mn-label {
+	margin: 0;
+	font-size: 14px;
+}
+
+.mn-ranges {
+	margin: 12px 0 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid var(--mn-line);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.mn-ranges li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	padding: 9px 14px;
+	background: var(--mn-paper);
+}
+
+.mn-ranges li + li {
+	border-top: 1px solid var(--mn-line);
+}
+
+.mn-ranges strong {
+	font-weight: 600;
+	color: var(--mn-ink);
+	flex: none;
+}
+
+.mn-ranges em {
+	font-style: normal;
+	font-size: 12px;
+	color: var(--mn-ink-3);
+	flex: 1;
+	min-width: 0;
+}
+
+.mn-ranges code {
+	flex: none;
+	padding: 2px 9px;
+	background: var(--mn-ground);
+	border-radius: 99px;
+	font-size: 12px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	color: var(--mn-ink);
+}
+
+.mn-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex: none;
+}
+
+.mn-dot-slow { background: #8f6ec5; }
+.mn-dot-normal { background: #2f81c7; }
+.mn-dot-fast { background: #2fa06a; }
+
+/* ---------- tip ---------- */
+
+.mn-tip {
+	margin-top: 16px;
+	padding: 12px 14px;
+	background: var(--mn-gold-soft);
+	border: 1px solid #f0dfa8;
+	border-radius: 8px;
+	font-size: 12.5px;
+	color: var(--mn-ink-2);
+}
+
+.mn-tip strong {
+	color: var(--mn-ink);
+}
+
+.mn-tip a {
+	color: var(--mn-ink);
+}
+
+/* ---------- side ---------- */
+
+.mn-links {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mn-links li {
+	margin: 0;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--mn-line);
+}
+
+.mn-links li:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.mn-links a {
+	text-decoration: none;
+	color: var(--mn-ink-2);
+	font-weight: 500;
+}
+
+.mn-links a:hover {
+	color: var(--mn-ink);
+}
+
+/* ---------- buttons ---------- */
+
+.mn-wrap .button {
+	border-color: var(--mn-line);
+	color: var(--mn-ink);
+	border-radius: 6px;
+}
+
+.mn-wrap .button:hover {
+	border-color: var(--mn-ink-3);
+	color: var(--mn-ink);
+}
+
+.mn-wrap .button-primary {
+	background: var(--mn-ink);
+	border-color: var(--mn-ink);
+	color: #fff;
+	padding: 2px 22px;
+	border-radius: 6px;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mn-wrap .button-primary:hover,
+.mn-wrap .button-primary:focus {
+	background: var(--mn-gold);
+	border-color: var(--mn-gold);
+	color: var(--mn-ink);
+}
+
+.mn-wrap .button:focus,
+.mn-wrap .button-primary:focus {
+	box-shadow: 0 0 0 2px rgba(245, 183, 10, 0.4);
+	outline: none;
+}
+
+.mn-save {
+	display: flex;
+	justify-content: flex-end;
+}
+
+/* ---------- tabs ---------- */
+
+.mn-tabs {
+	position: relative;
+	display: flex;
+	width: 100%;
+	max-width: 460px;
+	padding: 4px;
+	background: #e9eaed;
+	border-radius: 11px;
+}
+
+.mn-tab-thumb {
+	position: absolute;
+	top: 4px;
+	bottom: 4px;
+	left: 0;
+	width: 0;
+	background: var(--mn-ink);
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(15, 20, 25, 0.25);
+	transition: transform 0.22s cubic-bezier(0.3, 0.7, 0.4, 1), width 0.22s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mn-tab-thumb { transition: none; }
+}
+
+.mn-wrap .mn-tab {
+	position: relative;
+	z-index: 1;
+	flex: 1;
+	border: 0;
+	background: transparent;
+	padding: 8px 12px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--mn-ink-2);
+	border-radius: 8px;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: color 0.18s ease;
+}
+
+.mn-wrap .mn-tab:hover {
+	color: var(--mn-ink);
+}
+
+.mn-wrap .mn-tab.is-active {
+	color: #fff;
+}
+
+.mn-wrap .mn-tab:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(245, 183, 10, 0.5);
+}
+
+.mn-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+/* Tab mode only once JS is running; otherwise everything stays visible. */
+.mn-js .mn-panel {
+	display: none;
+}
+
+.mn-js .mn-panel.is-active {
+	display: flex;
+}
+
+.mn-js .mn-tabs ~ .mn-panel {
+	animation: mn-rise 0.25s ease both;
+}
+
+.mn-tips {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mn-tips li {
+	position: relative;
+	margin: 0 0 10px;
+	padding-left: 20px;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--mn-ink-2);
+}
+
+.mn-tips li:last-child {
+	margin-bottom: 0;
+}
+
+.mn-tips li::before {
+	content: "\2713";
+	position: absolute;
+	left: 0;
+	top: 0;
+	color: var(--mn-gold);
+	font-weight: 700;
+}
+
+/* ---------- tabs joined to the card ---------- */
+
+.mn-tabbed {
+	background: var(--mn-paper);
+	border: 1px solid var(--mn-line);
+	border-radius: var(--mn-radius);
+	overflow: hidden;
+	animation: mn-rise 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mn-tabbed { animation: none; }
+}
+
+.mn-tabstrip {
+	padding: 12px 16px;
+	background: var(--mn-paper);
+	border-bottom: 1px solid var(--mn-line);
+}
+
+.mn-tabbed .mn-tabs {
+	max-width: 560px;
+	border-radius: 10px;
+	padding: 4px;
+	background: #e9eaed;
+	border-bottom: 0;
+}
+
+.mn-tabbed .mn-tabs .mn-tab-thumb {
+	top: 4px;
+	bottom: 4px;
+}
+
+.mn-wrap .mn-tab:hover:not(.is-active) {
+	background: rgba(23, 28, 34, 0.06);
+}
+
+/* Hairline separators between inactive segments, macOS style. */
+.mn-wrap .mn-tab + .mn-tab::before {
+	content: "";
+	position: absolute;
+	left: -2px;
+	top: 26%;
+	bottom: 26%;
+	width: 1px;
+	background: rgba(23, 28, 34, 0.14);
+	transition: opacity 0.15s ease;
+}
+
+.mn-wrap .mn-tab.is-active::before,
+.mn-wrap .mn-tab.is-active + .mn-tab::before {
+	opacity: 0;
+}
+
+.mn-tabbed .mn-panel .mn-card {
+	border: 0;
+	border-radius: 0;
+	animation: none;
+}
+
+.mn-tabbed .mn-panel {
+	gap: 0;
+}
+
+.mn-tabbed .mn-panel .mn-card + .mn-card {
+	border-top: 1px solid var(--mn-line);
+}
+
+.mn-js .mn-tabbed .mn-tabs ~ .mn-panel {
+	animation: none;
 }

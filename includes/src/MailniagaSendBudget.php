@@ -7,7 +7,7 @@ namespace Webimpian\MailniagaWPConnector;
  * never releases its claim, stranding every action claimed alongside it.
  */
 class MailniagaSendBudget {
-	/** Well inside Action Scheduler's 30-second default limit. */
+	/** Well inside Action Scheduler's 30-second limit. */
 	public const DEFAULT_BUDGET = 15;
 
 	private float $started_at;

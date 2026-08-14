@@ -1,218 +1,530 @@
-.subsubsub{
-    margin-bottom: 10px;
+/* Mail Niaga log pages. Loads on top of settings-page.css for the shared tokens. */
+
+/* ---------- compact hero ---------- */
+
+.mn-wrap .mn-hero-compact {
+	padding: 22px 28px;
+	margin-bottom: 18px;
 }
 
-/* Table Styles */
-.wp-list-table {
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top:20px;
-    width: 100%;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.mn-wrap .mn-hero-compact .mn-hero-title {
+	font-size: 20px;
 }
 
-.wp-list-table th,
-.wp-list-table td {
-    padding: 16px;
-    border-bottom: 1px solid #e5e7eb;
+/* ---------- toolbar: filter pills + date/search ---------- */
+
+.mn-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
 }
 
-.wp-list-table th {
-    background-color: #f3f4f6;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-    color: #374151;
+.mn-wrap ul.mn-filter {
+	display: flex;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	flex-wrap: wrap;
 }
 
-.wp-list-table tr:last-child td {
-    border-bottom: none;
+.mn-wrap .mn-filter li {
+	margin: 0;
 }
 
-.wp-list-table tr:hover {
-    background-color: #f9fafb;
+.mn-wrap .mn-filter-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border: 1px solid var(--mn-line);
+	border-radius: 999px;
+	background: var(--mn-paper);
+	color: var(--mn-ink-2);
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.wp-list-table .view-details {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease-in-out;
+.mn-wrap .mn-filter-pill:hover {
+	color: var(--mn-ink);
+	border-color: #c9ced4;
 }
 
-.wp-list-table .view-details:hover {
-    color: #2563eb;
-    text-decoration: underline;
+.mn-wrap .mn-filter-pill.is-active {
+	background: var(--mn-ink);
+	border-color: var(--mn-ink);
+	color: #fff;
 }
 
-#email-log-form > table > thead > tr > th:nth-child(2),#wpbody-content > div.wrap > table > thead > tr > th:nth-child(1){
-    width: 60px;
-    max-width: 60px;
-    text-align: center;
+.mn-wrap .mn-filter-count {
+	font-weight: 500;
+	opacity: 0.7;
+	font-variant-numeric: tabular-nums;
 }
 
-/* WordPress-style Pagination */
-.tablenav {
-    clear: both;
-    height: 30px;
-    margin: 6px 0 4px;
-    vertical-align: middle;
+.mn-logfilter {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 
-.tablenav .tablenav-pages {
-    float: right;
-    display: inline-block;
-    margin: 0 0 9px;
-    font-size: 12px;
+.mn-logfilter label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mn-ink-3);
 }
 
-.tablenav .displaying-num {
-    margin-right: 10px;
-    color: #555;
-    font-size: 12px;
-    font-style: italic;
+.mn-wrap .mn-input-date {
+	width: 140px;
 }
 
-.tablenav .tablenav-pages .button,
-.tablenav .tablenav-pages .tablenav-pages-navspan{
-    margin: 0 2px !important;
+.mn-wrap .mn-input-search {
+	width: 180px;
 }
 
-.tablenav .tablenav-pages a,
-.tablenav .tablenav-pages span.current,
-.tablenav .tablenav-pages span.tablenav-pages-navspan {
-    display: inline-block;
-    min-width: 17px;
-    border: 1px solid #ccc;
-    padding: 3px 5px 7px;
-    background: #e5e5e5;
-    font-size: 16px;
-    line-height: 1;
-    font-weight: normal;
-    text-align: center;
-    text-decoration: none;
+/* ---------- table card ---------- */
+
+.mn-wrap .mn-tablecard {
+	padding: 0;
+	overflow: hidden;
 }
 
-.tablenav .tablenav-pages a,
-.tablenav .tablenav-pages span.tablenav-pages-navspan {
-    margin-left: 2px;
+.mn-tablenav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 14px 18px;
+	border-bottom: 1px solid var(--mn-line);
+	background: var(--mn-paper);
 }
 
-.tablenav .tablenav-pages a:hover,
-.tablenav .tablenav-pages a:focus {
-    background: #d3d3d3;
-    border-color: #999;
-    color: #000;
+.mn-bulk,
+.mn-tools {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 
-.tablenav .tablenav-pages a.disabled,
-.tablenav .tablenav-pages span.tablenav-pages-navspan {
-    color: #a0a5aa;
-    border-color: #ddd;
-    background: #f7f7f7;
-    cursor: default;
+.mn-wrap .mn-bulk select {
+	border: 1px solid var(--mn-line);
+	border-radius: 8px;
+	padding: 4px 28px 4px 10px;
+	font-size: 13px;
+	color: var(--mn-ink);
+	max-width: 100%;
 }
 
-.tablenav .tablenav-pages .current {
-    background: #f7f7f7;
-    border-color: #ddd;
-    font-weight: 600;
+.mn-table-scroll {
+	overflow-x: auto;
 }
 
-.tablenav .tablenav-pages input {
-    width: 35px;
-    padding: 3px 5px 6px;
-    font-size: 13px;
-    line-height: 1.5;
-    text-align: center;
+.mn-wrap .mn-table {
+	width: 100%;
+	min-width: 860px;
+	border-collapse: collapse;
+	font-size: 13px;
 }
 
-.tablenav-pages .paging-input {
-    margin: 0 6px;
+.mn-wrap .mn-table thead th,
+.mn-wrap .mn-table thead td {
+	padding: 10px 14px;
+	text-align: left;
+	font-size: 11px;
+	font-weight: 650;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--mn-ink-3);
+	background: var(--mn-ground);
+	border-bottom: 1px solid var(--mn-line);
+	white-space: nowrap;
 }
 
-/* Email Details Dialog Styles */
-.email-details-dialog {
-    width: 800px !important;
-    height: 80vh !important;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.mn-wrap .mn-table tbody td {
+	padding: 11px 14px;
+	border-bottom: 1px solid rgba(23, 28, 34, 0.05);
+	color: var(--mn-ink-2);
+	vertical-align: middle;
 }
 
-.email-details-wrapper {
-    padding: 24px !important;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: #f9fafb;
+.mn-wrap .mn-table tbody tr:last-child td {
+	border-bottom: 0;
 }
 
-.email-details-wrapper .email-details {
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+.mn-wrap .mn-table tbody tr:hover td {
+	background: #fafbfc;
 }
 
-.email-details-wrapper p {
-    margin-bottom: 12px;
-    line-height: 1.5;
+.mn-wrap .mn-table .mn-col-cb {
+	width: 36px;
+	padding-right: 0;
 }
 
-.email-details-wrapper strong {
-    font-weight: 600;
-    color: #374151;
+.mn-wrap .mn-table .mn-col-id {
+	width: 60px;
+	color: var(--mn-ink-3);
+	font-variant-numeric: tabular-nums;
 }
 
-.email-content-iframe {
-    width: 100%;
-    height: 500px!important;;
-    border: none;
-    flex-grow: 1;
-    overflow: auto;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+.mn-wrap .mn-table .mn-col-date {
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+	color: var(--mn-ink-3);
 }
 
-.email-details-dialog .ui-dialog-titlebar {
-    background-color: #3b82f6;
-    color: #ffffff;
-    border: none;
-    border-bottom: 1px solid #2563eb;
-    border-radius: 8px 8px 0 0;
+.mn-wrap .mn-table .mn-col-subject span,
+.mn-wrap .mn-table .mn-col-resp span,
+.mn-wrap .mn-table .mn-col-mx span {
+	display: inline-block;
+	max-width: 260px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: bottom;
 }
 
-.email-details-dialog .ui-dialog-title {
-    font-weight: 600;
+.mn-wrap .mn-table .mn-col-resp span {
+	max-width: 300px;
 }
 
-.email-details-dialog .ui-dialog-titlebar-close {
-    background: none;
-    border: none;
-    color: #ffffff;
-    opacity: 0.7;
-    transition: opacity 0.2s ease-in-out;
+.mn-wrap .mn-table .mn-col-mx span {
+	max-width: 160px;
 }
 
-.email-details-dialog .ui-dialog-titlebar-close:hover {
-    opacity: 1;
+.mn-wrap .mn-table .view-details {
+	font-weight: 600;
+	text-decoration: none;
 }
 
-.email-details-dialog .ui-dialog-content {
-    padding: 0;
-    height: calc(100% - 40px) !important;
-    overflow: hidden;
+.mn-logpage .mn-tablecard,
+.mn-logpage .mn-pagenav {
+	transition: opacity 0.1s ease;
 }
+
+.mn-logpage.mn-loading .mn-tablecard,
+.mn-logpage.mn-loading .mn-pagenav {
+	opacity: 0.45;
+	pointer-events: none;
+}
+
+.mn-logpage .mn-tablecard {
+	position: relative;
+}
+
+.mn-logpage.mn-loading .mn-tablecard::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 22px;
+	height: 22px;
+	margin: -11px 0 0 -11px;
+	border: 3px solid var(--mn-line);
+	border-top-color: var(--mn-ink);
+	border-radius: 50%;
+	animation: mn-spin 0.7s linear infinite;
+}
+
+@keyframes mn-spin {
+	to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mn-logpage.mn-loading .mn-tablecard::after { animation-duration: 1.6s; }
+}
+
+/* ---------- instant tooltips ---------- */
+
+.mn-tip-wrap {
+	position: relative;
+	display: inline-block;
+}
+
+.mn-tip-wrap::after {
+	content: attr(data-tip);
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	width: max-content;
+	max-width: 240px;
+	padding: 7px 11px;
+	border-radius: 8px;
+	background: var(--mn-ink);
+	color: #fff;
+	font-size: 12px;
+	line-height: 1.45;
+	font-weight: 400;
+	text-align: left;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	z-index: 30;
+}
+
+.mn-tip-wrap:hover::after,
+.mn-tip-wrap:focus-within::after {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* ---------- empty state ---------- */
+
+.mn-wrap .mn-empty-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	margin: 0 auto 12px;
+	border-radius: 50%;
+	background: var(--mn-gold-soft);
+	color: #8a6400;
+	font-size: 20px;
+}
+
+.mn-wrap .mn-empty-icon-good {
+	background: #eef9f0;
+	color: #1a7331;
+}
+
+.mn-wrap .mn-empty-title {
+	display: block;
+	margin-bottom: 4px;
+	font-size: 14px;
+	font-weight: 650;
+	color: var(--mn-ink);
+}
+
+.mn-wrap .mn-empty-hint {
+	display: block;
+	font-size: 13px;
+	color: var(--mn-ink-3);
+}
+
+.mn-wrap .mn-na {
+	color: var(--mn-ink-3);
+	opacity: 0.7;
+}
+
+.mn-wrap .mn-empty {
+	padding: 150px 24px;
+	text-align: center;
+	color: var(--mn-ink-3);
+}
+
+/* ---------- status pills ---------- */
+
+.mn-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.5;
+}
+
+.mn-pill-sent {
+	background: #eef9f0;
+	color: #1a7331;
+}
+
+.mn-pill-queued {
+	background: #eef3fb;
+	color: #2b5daa;
+}
+
+.mn-pill-processing {
+	background: #fdf3d7;
+	color: #8a6400;
+}
+
+.mn-pill-failed {
+	background: #fdf0ef;
+	color: #b32d2e;
+}
+
+.mn-pill-other {
+	background: var(--mn-ground);
+	color: var(--mn-ink-3);
+}
+
+/* ---------- pagination + footnote ---------- */
+
+.mn-wrap .mn-pagenav {
+	margin: 14px 0 4px;
+	height: auto;
+}
+
+.mn-wrap .mn-pagenav .tablenav-pages {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
+	float: none;
+	margin: 0;
+}
+
+.mn-wrap .mn-pagenav .displaying-num {
+	color: var(--mn-ink-3);
+	font-size: 13px;
+	font-style: normal;
+}
+
+.mn-wrap .mn-pagenav .pagination-links {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.mn-wrap .mn-pagenav .paging-input {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 6px;
+	margin: 0 4px;
+	color: var(--mn-ink-2);
+}
+
+.mn-wrap .mn-pagenav .current-page {
+	border: 1px solid var(--mn-line);
+	border-radius: 8px;
+	padding: 3px 6px;
+	text-align: center;
+	width: 44px;
+}
+
+.mn-wrap .mn-retention {
+	margin-top: 10px;
+}
+
+/* ---------- danger button + confirm modal (modal sits outside .mn-wrap, literal colors) ---------- */
+
+.mn-wrap .button.mn-danger {
+	background: #b32d2e;
+	border-color: #b32d2e;
+	color: #fff;
+}
+
+.mn-wrap .button.mn-danger:hover,
+.mn-wrap .button.mn-danger:focus {
+	background: #9a2424;
+	border-color: #9a2424;
+	color: #fff;
+}
+
+.mn-modal-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background: rgba(23, 28, 34, 0.55);
+}
+
+.mn-modal {
+	width: 100%;
+	max-width: 420px;
+	padding: 22px 24px;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 24px 60px rgba(23, 28, 34, 0.3);
+}
+
+.mn-modal-title {
+	margin: 0 0 6px;
+	font-size: 15px;
+	font-weight: 650;
+	color: #171c22;
+}
+
+.mn-modal-msg {
+	margin: 0 0 18px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: #4b5560;
+}
+
+.mn-modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.mn-modal .button.mn-danger {
+	background: #b32d2e;
+	border-color: #b32d2e;
+	color: #fff;
+}
+
+.mn-modal .button.mn-danger:hover,
+.mn-modal .button.mn-danger:focus {
+	background: #9a2424;
+	border-color: #9a2424;
+	color: #fff;
+}
+
+/* ---------- email details dialog (outside .mn-wrap, literal colors) ---------- */
 
 .ui-dialog.email-details-dialog {
-    overflow: hidden;
+	border: 1px solid #e2e5e9;
+	border-radius: 12px;
+	box-shadow: 0 24px 60px rgba(23, 28, 34, 0.25);
+	overflow: hidden;
+	background: #fff;
+	padding: 0;
 }
 
+.ui-dialog.email-details-dialog .ui-dialog-titlebar {
+	background: #171c22;
+	color: #fff;
+	border: 0;
+	border-radius: 0;
+	padding: 12px 18px;
+	font-weight: 650;
+}
+
+.ui-dialog.email-details-dialog .ui-dialog-titlebar-close {
+	background: transparent;
+	border: 0;
+	color: #fff;
+	right: 10px;
+	cursor: pointer;
+}
+
+.ui-dialog.email-details-dialog .ui-dialog-content {
+	padding: 18px;
+	font-size: 13px;
+	color: #4b5560;
+	height: auto !important;
+	max-height: 65vh;
+	overflow: auto;
+}
+
+.email-details-dialog .email-details-wrapper p {
+	display: flex;
+	gap: 10px;
+	margin: 0 0 6px;
+}
+
+.email-details-dialog .email-details-wrapper strong {
+	color: #171c22;
+}
+
+.email-details-dialog .email-content-iframe {
+	width: 100%;
+	height: 320px;
+	margin-top: 10px;
+	border: 1px solid #e2e5e9;
+	border-radius: 8px;
+	background: #fff;
+}

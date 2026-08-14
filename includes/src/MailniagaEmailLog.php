@@ -3,7 +3,7 @@
 namespace Webimpian\MailniagaWPConnector;
 
 class MailniagaEmailLog {
-	private int $per_page = 10;
+	private int $per_page = 25;
 	private int $days_to_keep = 7;
 
 	public function register() {
@@ -35,25 +35,30 @@ class MailniagaEmailLog {
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('jquery-ui-core');
 		wp_enqueue_script('jquery-ui-dialog');
-		wp_enqueue_script('jquery-ui-datepicker');
 		wp_enqueue_style('wp-jquery-ui-dialog');
-		wp_enqueue_style('jquery-ui-datepicker');
 
-		wp_enqueue_style('jquery-ui-style', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+		$base = trailingslashit(MAILNIAGA_WP_CONNECTOR['PATH']) . 'includes/src/assets/';
+
+		wp_enqueue_style(
+			'mailniaga-settings-page',
+			MAILNIAGA_WP_CONNECTOR['URL'] . 'includes/src/assets/css/settings-page.css',
+			[],
+			(string) filemtime($base . 'css/settings-page.css')
+		);
 
 		wp_enqueue_script(
 			'mailniaga-email-log',
 			MAILNIAGA_WP_CONNECTOR['URL'] . 'includes/src/assets/js/email-log.js',
-			['jquery', 'jquery-ui-core', 'jquery-ui-dialog', 'jquery-ui-datepicker'],
-			MAILNIAGA_WP_CONNECTOR['VERSION'],
+			['jquery', 'jquery-ui-core', 'jquery-ui-dialog'],
+			(string) filemtime($base . 'js/email-log.js'),
 			true
 		);
 
 		wp_enqueue_style(
 			'mailniaga-email-log',
 			MAILNIAGA_WP_CONNECTOR['URL'] . 'includes/src/assets/css/email-log.css',
-			[],
-			MAILNIAGA_WP_CONNECTOR['VERSION']
+			['mailniaga-settings-page'],
+			(string) filemtime($base . 'css/email-log.css')
 		);
 
 		wp_localize_script('mailniaga-email-log', 'mailniagaEmailLog', [
@@ -61,6 +66,7 @@ class MailniagaEmailLog {
 			'nonce' => wp_create_nonce('mailniaga_email_details'),
 			'i18n' => [
 				'emailDetails' => __('Email Details', 'mailniaga-smtp'),
+				'cancel' => __('Cancel', 'mailniaga-smtp'),
 			],
 		]);
 	}
@@ -102,92 +108,142 @@ class MailniagaEmailLog {
 		$status_counts = $this->get_status_counts();
 
 		?>
-        <div class="wrap">
-            <h1><?php echo esc_html(__('Mail Niaga Email Log', 'mailniaga-smtp')); ?></h1>
+        <div class="wrap mn-wrap mn-logpage">
+            <h1 class="screen-reader-text"><?php echo esc_html(__('Mail Niaga Email Log', 'mailniaga-smtp')); ?></h1>
 
-			<?php
-			$this->render_filter_tabs($status, $status_counts);
-			$this->display_auto_delete_notice();
-			?>
-            <div class="datefilter alignright">
+            <header class="mn-hero mn-hero-compact">
+                <div class="mn-hero-brand">
+                    <div>
+                        <p class="mn-hero-title"><?php esc_html_e('Email', 'mailniaga-smtp'); ?> <span class="mn-gold-word"><?php esc_html_e('Log', 'mailniaga-smtp'); ?></span></p>
+                        <p class="mn-hero-sub"><?php esc_html_e('Every email queued and sent from this site.', 'mailniaga-smtp'); ?></p>
+                    </div>
+                </div>
+                <div class="mn-hero-stats">
+                    <div class="mn-stat">
+                        <span class="mn-stat-value mn-stat-gold"><?php echo esc_html(number_format_i18n($status_counts['sent'] ?? 0)); ?></span>
+                        <span class="mn-stat-label"><?php esc_html_e('Sent', 'mailniaga-smtp'); ?></span>
+                    </div>
+                    <div class="mn-stat">
+                        <span class="mn-stat-value"><?php echo esc_html(number_format_i18n($status_counts['queued'] ?? 0)); ?></span>
+                        <span class="mn-stat-label"><?php esc_html_e('In queue', 'mailniaga-smtp'); ?></span>
+                    </div>
+                    <div class="mn-stat">
+                        <span class="mn-stat-value"><?php echo esc_html(number_format_i18n($status_counts['failed'] ?? 0)); ?></span>
+                        <span class="mn-stat-label"><?php esc_html_e('Failed', 'mailniaga-smtp'); ?></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="mn-toolbar">
+				<?php $this->render_filter_tabs($status, $status_counts); ?>
 				<?php $this->render_date_filter($from_date, $to_date, $search); ?>
             </div>
+
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" id="email-log-form">
                 <input type="hidden" name="action" value="mailniaga_bulk_action">
 				<?php wp_nonce_field('mailniaga_bulk_action', 'mailniaga_bulk_action_nonce'); ?>
 
-                <div class="tablenav top">
-                    <div class="alignleft actions bulkactions">
-                        <label for="bulk-action-selector-top" class="screen-reader-text"><?php _e('Select bulk action', 'mailniaga-smtp'); ?></label>
-                        <select name="bulk_action" id="bulk-action-selector-top">
-                            <option value="-1"><?php _e('Bulk Actions', 'mailniaga-smtp'); ?></option>
-                            <option value="delete"><?php _e('Delete', 'mailniaga-smtp'); ?></option>
-                            <option value="requeue"><?php _e('Resend Email', 'mailniaga-smtp'); ?></option>
-                        </select>
-                        <input type="submit" id="doaction" class="button action" value="<?php esc_attr_e('Apply', 'mailniaga-smtp'); ?>">
+                <section class="mn-card mn-tablecard">
+                    <div class="mn-tablenav">
+                        <div class="mn-bulk">
+                            <label for="bulk-action-selector-top" class="screen-reader-text"><?php _e('Select bulk action', 'mailniaga-smtp'); ?></label>
+                            <select name="bulk_action" id="bulk-action-selector-top">
+                                <option value="-1"><?php _e('Bulk Actions', 'mailniaga-smtp'); ?></option>
+                                <option value="delete"><?php _e('Delete', 'mailniaga-smtp'); ?></option>
+                                <option value="requeue"><?php _e('Resend Email', 'mailniaga-smtp'); ?></option>
+                            </select>
+                            <span class="mn-tip-wrap" data-tip="<?php esc_attr_e('Runs the chosen action on the ticked emails.', 'mailniaga-smtp'); ?>">
+                                <input type="submit" id="doaction" class="button action" value="<?php esc_attr_e('Apply', 'mailniaga-smtp'); ?>">
+                            </span>
+                        </div>
+                        <div class="mn-tools">
+                            <span class="mn-tip-wrap" data-tip="<?php esc_attr_e('Permanently removes every entry in this log. Emails already sent are not affected.', 'mailniaga-smtp'); ?>">
+                                <input type="submit" name="clear_all_logs" class="button action mn-danger" value="<?php esc_attr_e('Delete all logs', 'mailniaga-smtp'); ?>" data-confirm="<?php esc_attr_e('This permanently deletes every email log. It cannot be undone.', 'mailniaga-smtp'); ?>" data-confirm-label="<?php esc_attr_e('Delete all logs', 'mailniaga-smtp'); ?>">
+                            </span>
+                            <span class="mn-tip-wrap" data-tip="<?php esc_attr_e('Puts every failed email back in the queue to be sent again.', 'mailniaga-smtp'); ?>">
+                                <input type="submit" name="resend_all_failed" class="button action" value="<?php esc_attr_e('Retry failed emails', 'mailniaga-smtp'); ?>" data-confirm="<?php esc_attr_e('Every failed email goes back in the queue and is sent again.', 'mailniaga-smtp'); ?>" data-confirm-label="<?php esc_attr_e('Retry all', 'mailniaga-smtp'); ?>">
+                            </span>
+                            <span class="mn-tip-wrap" data-tip="<?php esc_attr_e('Returns emails stuck in Processing to the queue.', 'mailniaga-smtp'); ?>">
+                                <input type="submit" name="recover_processing" class="button action" value="<?php esc_attr_e('Requeue stuck emails', 'mailniaga-smtp'); ?>" data-confirm="<?php esc_attr_e('Emails stuck in Processing go back in the queue and are sent again.', 'mailniaga-smtp'); ?>" data-confirm-label="<?php esc_attr_e('Requeue', 'mailniaga-smtp'); ?>">
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <input type="hidden" name="action" value="mailniaga_bulk_action">
-						<?php wp_nonce_field('mailniaga_bulk_action', 'mailniaga_bulk_action_nonce'); ?>
-                        <input type="submit" name="clear_all_logs" class="button action" value="<?php esc_attr_e('Clear All Logs', 'mailniaga-smtp'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to clear all email logs?', 'mailniaga-smtp'); ?>');">
-                        <input type="submit" name="resend_all_failed" class="button action" value="<?php esc_attr_e('Resend All Failed', 'mailniaga-smtp'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to resend all failed emails?', 'mailniaga-smtp'); ?>');">
-                        <input type="submit" name="recover_processing" class="button action" value="<?php esc_attr_e('Restart Processing Emails', 'mailniaga-smtp'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to requeue all processing emails?', 'mailniaga-smtp'); ?>');">
-                    </div>
-                </div>
 
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                    <tr>
-                        <td id="cb" class="manage-column column-cb check-column">
-                            <label class="screen-reader-text" for="cb-select-all-1"><?php _e('Select All', 'mailniaga-smtp'); ?></label>
-                            <input id="cb-select-all-1" type="checkbox">
-                        </td>
-                        <th><?php _e('ID', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('From', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('To', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('Subject', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('Status', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('Created', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('Updated', 'mailniaga-smtp'); ?></th>
-                        <th><?php _e('Actions', 'mailniaga-smtp'); ?></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-					<?php if (empty($emails)): ?>
+                    <div class="mn-table-scroll">
+                    <table class="mn-table">
+                        <thead>
                         <tr>
-                            <td colspan="8" style="text-align: center;">
-                                <p><?php _e('No email logs found.', 'mailniaga-smtp'); ?></p>
+                            <td class="mn-col-cb">
+                                <label class="screen-reader-text" for="cb-select-all-1"><?php _e('Select All', 'mailniaga-smtp'); ?></label>
+                                <input id="cb-select-all-1" type="checkbox">
                             </td>
+                            <th class="mn-col-id"><?php _e('ID', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('From', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('To', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('Subject', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('Status', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('Created', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('Updated', 'mailniaga-smtp'); ?></th>
+                            <th><?php _e('Actions', 'mailniaga-smtp'); ?></th>
                         </tr>
-					<?php else: ?>
-					<?php endif; ?>
-					<?php foreach ($emails as $email): ?>
-                        <tr>
-                            <th scope="row" class="check-column">
-                                <label class="screen-reader-text" for="cb-select-<?php echo esc_attr($email->id); ?>"><?php printf(__('Select email %s', 'mailniaga-smtp'), $email->id); ?></label>
-                                <input id="cb-select-<?php echo esc_attr($email->id); ?>" type="checkbox" name="email_ids[]" value="<?php echo esc_attr($email->id); ?>">
-                            </th>
-                            <td><?php echo esc_html($email->id); ?></td>
-                            <td><?php echo esc_html($email->from_email); ?></td>
-                            <td><?php echo esc_html($email->to_email); ?></td>
-                            <td><?php echo esc_html($email->subject); ?></td>
-                            <td><?php echo esc_html($email->status); ?></td>
-                            <td><?php echo esc_html($email->created_at); ?></td>
-                            <td><?php echo esc_html($email->updated_at); ?></td>
-                            <td>
-                                <a href="#" class="view-details" data-id="<?php echo esc_attr($email->id); ?>"><?php _e('View Details', 'mailniaga-smtp'); ?></a>
-                            </td>
-                        </tr>
-					<?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+						<?php if (empty($emails)): ?>
+                            <tr>
+                                <td colspan="9" class="mn-empty">
+                                    <span class="mn-empty-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+                                    <span class="mn-empty-title"><?php _e('No emails found', 'mailniaga-smtp'); ?></span>
+                                    <span class="mn-empty-hint"><?php _e('Try a different filter or date range. New emails appear here as your site sends them.', 'mailniaga-smtp'); ?></span>
+                                </td>
+                            </tr>
+						<?php endif; ?>
+						<?php foreach ($emails as $email): ?>
+                            <tr>
+                                <td class="mn-col-cb">
+                                    <label class="screen-reader-text" for="cb-select-<?php echo esc_attr($email->id); ?>"><?php printf(__('Select email %s', 'mailniaga-smtp'), $email->id); ?></label>
+                                    <input id="cb-select-<?php echo esc_attr($email->id); ?>" type="checkbox" name="email_ids[]" value="<?php echo esc_attr($email->id); ?>">
+                                </td>
+                                <td class="mn-col-id"><?php echo esc_html($email->id); ?></td>
+                                <td><?php echo esc_html($email->from_email); ?></td>
+                                <td><?php echo esc_html($email->to_email); ?></td>
+                                <td class="mn-col-subject"><span title="<?php echo esc_attr($email->subject); ?>"><?php echo esc_html($email->subject); ?></span></td>
+                                <td><?php echo $this->status_pill($email->status); // phpcs:ignore WordPress.Security.EscapeOutput ?></td>
+                                <td class="mn-col-date"><?php echo esc_html($email->created_at); ?></td>
+                                <td class="mn-col-date"><?php echo esc_html($email->updated_at); ?></td>
+                                <td>
+                                    <a href="#" class="view-details" data-id="<?php echo esc_attr($email->id); ?>"><?php _e('View Details', 'mailniaga-smtp'); ?></a>
+                                </td>
+                            </tr>
+						<?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                </section>
             </form>
 			<?php
-			$this->pagination($page, $total_items, $status, $from_date, $to_date);
+			$this->pagination($page, $total_items, $status, $from_date, $to_date, $search);
+			$this->display_auto_delete_notice();
 			$this->render_email_details_modal();
 			?>
         </div>
 		<?php
+	}
+
+	private function status_pill(string $status): string {
+		$labels = [
+			'sent' => __('Sent', 'mailniaga-smtp'),
+			'queued' => __('Queued', 'mailniaga-smtp'),
+			'processing' => __('Processing', 'mailniaga-smtp'),
+			'failed' => __('Failed', 'mailniaga-smtp'),
+		];
+
+		$known = isset($labels[$status]);
+
+		return sprintf(
+			'<span class="mn-pill mn-pill-%s">%s</span>',
+			esc_attr($known ? $status : 'other'),
+			esc_html($known ? $labels[$status] : $status)
+		);
 	}
 
 	private function render_filter_tabs($current_status, $status_counts) {
@@ -199,20 +255,18 @@ class MailniagaEmailLog {
 			'failed' => __('Failed', 'mailniaga-smtp'),
 		];
 
-		echo '<ul class="subsubsub">';
-		$links = [];
+		echo '<ul class="mn-filter">';
 		foreach ($statuses as $status => $label) {
 			$count = $status_counts[$status] ?? 0;
-			$class = ($status === $current_status) ? 'current' : '';
-			$links[] = sprintf(
-				'<li><a href="%s" class="%s">%s <span class="count">(%s)</span></a></li>',
-				esc_url(add_query_arg('status', $status)),
+			$class = ($status === $current_status) ? ' is-active' : '';
+			printf(
+				'<li><a href="%s" class="mn-filter-pill%s">%s <span class="mn-filter-count">%s</span></a></li>',
+				esc_url(add_query_arg(['status' => $status, 'paged' => 1])),
 				esc_attr($class),
 				esc_html($label),
 				number_format_i18n($count)
 			);
 		}
-		echo implode(' | ', $links);
 		echo '</ul>';
 	}
 
@@ -276,7 +330,7 @@ class MailniagaEmailLog {
 			$query .= " WHERE " . implode(' AND ', $where_clauses);
 			return $wpdb->get_var($wpdb->prepare($query, $args));
 		} else {
-			// Direct query without prepare when no conditions
+			// Nothing to prepare when no filters are set.
 			return $wpdb->get_var($query);
 		}
 	}
@@ -324,10 +378,10 @@ class MailniagaEmailLog {
 		return $wpdb->get_results($wpdb->prepare($query, $args));
 	}
 
-	private function pagination($page, $total_items, $status, $from_date, $to_date) {
+	private function pagination($page, $total_items, $status, $from_date, $to_date, $search = '') {
 		$total_pages = ceil($total_items / $this->per_page);
 
-		$output = '<div class="tablenav"><div class="tablenav-pages">';
+		$output = '<div class="tablenav mn-pagenav"><div class="tablenav-pages">';
 		$output .= '<span class="displaying-num">' . sprintf(_n('%s item', '%s items', $total_items, 'mailniaga-smtp'), number_format_i18n($total_items)) . '</span>';
 
 		$output .= '<span class="pagination-links">';
@@ -336,6 +390,7 @@ class MailniagaEmailLog {
 			'status' => $status,
 			'from_date' => $from_date,
 			'to_date' => $to_date,
+			'search' => $search,
 		]);
 
 		if ($page > 1) {
@@ -518,25 +573,28 @@ class MailniagaEmailLog {
 
 	private function render_date_filter($from_date, $to_date, $search) {
 		?>
-        <form method="get" action="">
+        <form method="get" action="" class="mn-logfilter">
             <input type="hidden" name="page" value="mailniaga-smtp-log">
             <input type="hidden" name="status" value="<?php echo esc_attr($_GET['status'] ?? 'all'); ?>">
-            <label for="from_date"><?php _e('From:', 'mailniaga-smtp'); ?></label>
-            <input type="text" id="from_date" name="from_date" value="<?php echo esc_attr($from_date); ?>" class="date-picker">
-            <label for="to_date"><?php _e('To:', 'mailniaga-smtp'); ?></label>
-            <input type="text" id="to_date" name="to_date" value="<?php echo esc_attr($to_date); ?>" class="date-picker">
-            <label for="search"><?php _e('Search:', 'mailniaga-smtp'); ?></label>
-            <input type="text" id="search" name="search" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('Search emails...', 'mailniaga-smtp'); ?>">
+            <label for="from_date"><?php _e('From', 'mailniaga-smtp'); ?></label>
+            <input type="date" id="from_date" name="from_date" value="<?php echo esc_attr($from_date); ?>" class="mn-input mn-input-date">
+            <label for="to_date"><?php _e('To', 'mailniaga-smtp'); ?></label>
+            <input type="date" id="to_date" name="to_date" value="<?php echo esc_attr($to_date); ?>" class="mn-input mn-input-date">
+            <input type="text" id="search" name="search" value="<?php echo esc_attr($search); ?>" class="mn-input mn-input-search" placeholder="<?php esc_attr_e('Search emails…', 'mailniaga-smtp'); ?>">
             <input type="submit" class="button" value="<?php esc_attr_e('Filter', 'mailniaga-smtp'); ?>">
         </form>
 		<?php
 	}
 
 	public function display_auto_delete_notice() {
-		$message = sprintf(
-			__('Notice: Email logs older than %d days will be automatically deleted.', 'mailniaga-smtp'),
-			$this->days_to_keep
+		printf(
+			'<div class="mn-tip mn-retention"><strong>%s</strong> %s</div>',
+			esc_html__('Note:', 'mailniaga-smtp'),
+			esc_html(sprintf(
+				/* translators: %d: number of days logs are kept. */
+				__('Email logs older than %d days are deleted automatically.', 'mailniaga-smtp'),
+				$this->days_to_keep
+			))
 		);
-		echo "<div class='notice notice-warning'><p>{$message}</p></div>";
 	}
 }

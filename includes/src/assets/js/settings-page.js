@@ -1,8 +1,28 @@
 jQuery(document).ready(function($) {
-    // Webhook generation
+    // Inline status line under the API key field.
+    function apiStatus(type, message) {
+        $('#api-status').attr('class', 'mn-status mn-status-' + type).text(message).show();
+    }
+
+    // Balances at the gateway cap and above mean unlimited.
+    function formatCredits(value) {
+        var n = Number(value);
+        if (isNaN(n)) {
+            return value;
+        }
+        return n >= 999999999 ? 'Unlimited' : n.toLocaleString();
+    }
+
+    function formatNumber(value) {
+        var n = Number(value);
+        return isNaN(n) ? value : n.toLocaleString();
+    }
+
     $('#generate_webhook').on('click', function() {
         var $webhookField = $('#mailniaga_webhook');
         var $generateButton = $(this);
+
+        $('.mn-webhook-error').remove();
 
         $.ajax({
             url: ajaxurl,
@@ -13,43 +33,38 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    $webhookField.val(response.data.webhook);
+                    $webhookField.val(response.data.callback_url);
                     $webhookField.attr('readonly', true);
                     $generateButton.hide();
 
-                    // Add the callback URL and copy button below the webhook field
-                    var $callbackUrlContainer = $('<p><strong>Callback URL:</strong> <code id="webhook_callback_url">' + response.data.callback_url + '</code> <button id="copy_webhook_url" class="button button-secondary">Copy URL</button></p>');
-                    $callbackUrlContainer.insertAfter($generateButton);
-
-                    // Initialize the copy button functionality
-                    initCopyButton();
-
-                    // Reload the page after a short delay
+                    // Reload so the field renders with its copy button
                     setTimeout(function() {
                         location.reload();
                     }, 1000);
                 } else {
-                    alert('Failed to generate webhook. Please try again.');
+                    $generateButton.closest('.mn-input-group').after('<p class="mn-status mn-status-error mn-webhook-error">Could not generate the webhook. Please try again.</p>');
                 }
             },
             error: function() {
-                alert('An error occurred. Please try again.');
+                $generateButton.closest('.mn-input-group').after('<p class="mn-status mn-status-error mn-webhook-error">Could not generate the webhook. Please try again.</p>');
             }
         });
     });
 
     function initCopyButton() {
         $('#copy_webhook_url').on('click', function() {
-            var webhookUrl = $('#webhook_callback_url').text();
+            var $button = $(this);
+            var webhookUrl = $('#mailniaga_webhook').val();
             navigator.clipboard.writeText(webhookUrl).then(function() {
-                alert('Webhook URL copied to clipboard!');
-            }, function(err) {
-                alert('Failed to copy. Please try again or copy manually.');
+                $button.text('Copied');
+                setTimeout(function() { $button.text('Copy URL'); }, 2000);
+            }, function() {
+                $button.text('Copy failed');
+                setTimeout(function() { $button.text('Copy URL'); }, 2000);
             });
         });
     }
 
-    // Initialize copy button if it already exists on page load
     initCopyButton();
 
     $('#verify-api').on('click', function() {
@@ -60,7 +75,13 @@ jQuery(document).ready(function($) {
 
         var apiKey = $apiKeyField.val();
 
+        if (!apiKey) {
+            apiStatus('error', 'Enter your API key, then click Verify API.');
+            return;
+        }
+
         $verifyButton.prop('disabled', true).text('Verifying...');
+        apiStatus('busy', 'Checking your API key…');
 
         $.ajax({
             url: ajaxurl,
@@ -73,25 +94,34 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     var data = response.data;
-                    var detailsHtml = '<p><strong>Organization:</strong> ' + data.organisation + '</p>' +
-                        '<p><strong>Email:</strong> ' + data.email + '</p>' +
-                        '<p><strong>Limit Quota:</strong> ' + data.limit_quota + '</p>' +
-                        '<p><strong>Total Usage:</strong> ' + data.total_usage + '</p>' +
-                        '<p><strong>Credit Balance:</strong> ' + data.credit_balance + '</p>';
+                    var row = function(label, value) {
+                        return '<tr><th scope="row">' + label + '</th><td>' + value + '</td></tr>';
+                    };
+                    var detailsHtml = '<table class="mn-account-table"><tbody>' +
+                        row('Organization', data.organisation) +
+                        row('Email', data.email) +
+                        row('Limit Quota', formatCredits(data.limit_quota)) +
+                        row('Total Usage', formatNumber(data.total_usage)) +
+                        row('Credit Balance', formatCredits(data.credit_balance)) +
+                        '</tbody></table>';
 
+                    apiStatus('ok', 'Connected — your API key is valid. Account details below.');
                     $apiDetails.html(detailsHtml);
                     $apiVerificationResults.show();
+
+                    // Deep-link gateway links straight to this account's settings.
+                    if (typeof data.account_id === 'string' && /^[0-9a-f]{24}$/i.test(data.account_id)) {
+                        $('.mn-gateway-edit').attr('href', 'https://gateway.mailniaga.mx/smtp-accounts/' + data.account_id + '/edit');
+                    }
                 } else {
-                    $apiKeyField.val(''); // Reset the API key field
-                    alert('API verification failed: ' + response.data.message + '\nThe API key field has been reset.');
-                    $apiDetails.html(''); // Clear any previous API details
+                    apiStatus('error', 'This API key was not accepted. Check it against your Mail Niaga dashboard and try again.');
+                    $apiDetails.html('');
                     $apiVerificationResults.hide();
                 }
             },
             error: function() {
-                $apiKeyField.val(''); // Reset the API key field
-                alert('An error occurred during API verification. The API key field has been reset. Please try again.');
-                $apiDetails.html(''); // Clear any previous API details
+                apiStatus('error', 'Could not reach Mail Niaga to verify the key. Check your connection and try again.');
+                $apiDetails.html('');
                 $apiVerificationResults.hide();
             },
             complete: function() {
@@ -100,11 +130,97 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // Function to verify API on page load
-    function verifyApiOnLoad() {
+    // Send the test email in place instead of reloading the page.
+    $('#mn-test-email-form').on('submit', function(e) {
+        e.preventDefault();
+
+        var $form = $(this);
+        var $button = $form.find('[name="send_test_email"]');
+
+        function testStatus(type, message) {
+            $('#test-email-status').attr('class', 'mn-status mn-status-' + type).text(message).show();
+        }
+
+        $button.prop('disabled', true);
+        testStatus('busy', 'Sending…');
+
+        $.post(ajaxurl, {
+            action: 'mailniaga_send_test_email',
+            mailniaga_test_email_nonce: $form.find('[name="mailniaga_test_email_nonce"]').val(),
+            test_email: $form.find('#test_email').val()
+        }).done(function(response) {
+            if (response.success) {
+                testStatus('ok', response.data.message);
+            } else {
+                testStatus('error', (response.data && response.data.message) || 'Could not send the test email.');
+            }
+        }).fail(function() {
+            testStatus('error', 'Could not send the test email. Please try again.');
+        }).always(function() {
+            $button.prop('disabled', false);
+        });
+    });
+
+    // Auto-verify whenever the user finishes editing the key.
+    var lastTriedKey = $('input[name="mailniaga_wp_connector_settings[api_key]"]').val();
+    $('input[name="mailniaga_wp_connector_settings[api_key]"]').on('blur', function() {
+        if ($(this).val() && $(this).val() !== lastTriedKey) {
+            lastTriedKey = $(this).val();
+            $('#verify-api').trigger('click');
+        }
+    });
+
+    // Verify the saved key on page load so the user sees its status right away.
+    if (lastTriedKey) {
         $('#verify-api').trigger('click');
     }
+});
+// Settings tabs. Without JS the panels simply stay stacked.
+jQuery(function ($) {
+    var $wrap = $('.mn-wrap');
+    if (!$wrap.length) {
+        return;
+    }
+    $wrap.addClass('mn-js');
 
-    // Verify API on page load
-    verifyApiOnLoad();
+    function positionThumb() {
+        var $active = $('.mn-tab.is-active');
+        if (!$active.length) {
+            return;
+        }
+        $('.mn-tab-thumb').css({
+            width: $active.outerWidth() + 'px',
+            transform: 'translateX(' + $active.position().left + 'px)'
+        });
+    }
+
+    function activate(name) {
+        $('.mn-tab').each(function () {
+            var on = $(this).data('panel') === name;
+            $(this).toggleClass('is-active', on).attr('aria-selected', on ? 'true' : 'false');
+        });
+        $('.mn-panel').each(function () {
+            $(this).toggleClass('is-active', $(this).data('panel') === name);
+        });
+        positionThumb();
+    }
+
+    $('.mn-tabs').on('click', '.mn-tab', function () {
+        activate($(this).data('panel'));
+    });
+
+    $('.mn-tabs').on('keydown', function (e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+            return;
+        }
+        var $tabs = $('.mn-tab');
+        var i = $tabs.index($('.mn-tab.is-active'));
+        i = (i + (e.key === 'ArrowRight' ? 1 : -1) + $tabs.length) % $tabs.length;
+        activate($tabs.eq(i).data('panel'));
+        $tabs.eq(i).trigger('focus');
+    });
+
+    positionThumb();
+
+    $(window).on('resize', positionThumb);
 });

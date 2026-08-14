@@ -3,7 +3,7 @@
 namespace Webimpian\MailniagaWPConnector;
 
 class MailniagaFailedDeliveriesLog {
-	private int $per_page = 10;
+	private int $per_page = 25;
 
 	public function register() {
 		add_action('admin_menu', [$this, 'add_submenu_page']);
@@ -23,7 +23,6 @@ class MailniagaFailedDeliveriesLog {
 	}
 
 	public function screen_option() {
-		// Add screen options if needed
 	}
 
 	public function enqueue_scripts($hook) {
@@ -31,11 +30,28 @@ class MailniagaFailedDeliveriesLog {
 			return;
 		}
 
+		$base = trailingslashit(MAILNIAGA_WP_CONNECTOR['PATH']) . 'includes/src/assets/';
+
+		wp_enqueue_style(
+			'mailniaga-settings-page',
+			MAILNIAGA_WP_CONNECTOR['URL'] . 'includes/src/assets/css/settings-page.css',
+			[],
+			(string) filemtime($base . 'css/settings-page.css')
+		);
+
 		wp_enqueue_style(
 			'mailniaga-email-log',
 			MAILNIAGA_WP_CONNECTOR['URL'] . 'includes/src/assets/css/email-log.css',
-			[],
-			MAILNIAGA_WP_CONNECTOR['VERSION']
+			['mailniaga-settings-page'],
+			(string) filemtime($base . 'css/email-log.css')
+		);
+
+		wp_enqueue_script(
+			'mailniaga-email-log',
+			MAILNIAGA_WP_CONNECTOR['URL'] . 'includes/src/assets/js/email-log.js',
+			['jquery'],
+			(string) filemtime($base . 'js/email-log.js'),
+			true
 		);
 	}
 
@@ -45,50 +61,85 @@ class MailniagaFailedDeliveriesLog {
 		$failed_deliveries = $this->get_failed_deliveries($page);
 
 		?>
-        <div class="wrap">
-            <h1><?php echo esc_html(__('Failed Deliveries', 'mailniaga-smtp')); ?></h1>
+        <div class="wrap mn-wrap mn-logpage">
+            <h1 class="screen-reader-text"><?php echo esc_html(__('Failed Deliveries', 'mailniaga-smtp')); ?></h1>
 
-            <table class="wp-list-table widefat fixed striped mailniaga-email-log-table">
-                <thead>
-                <tr>
-                    <th><?php _e('ID', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('Domain', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('To Email', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('From Email', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('MX', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('Response', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('Created At', 'mailniaga-smtp'); ?></th>
-                    <th><?php _e('Unsubscribed', 'mailniaga-smtp'); ?></th>
-                </tr>
-                </thead>
-                <tbody>
-				<?php if (empty($failed_deliveries)): ?>
+            <header class="mn-hero mn-hero-compact">
+                <div class="mn-hero-brand">
+                    <div>
+                        <p class="mn-hero-title"><?php esc_html_e('Failed', 'mailniaga-smtp'); ?> <span class="mn-gold-word"><?php esc_html_e('Deliveries', 'mailniaga-smtp'); ?></span></p>
+                        <p class="mn-hero-sub"><?php esc_html_e('Addresses Mail Niaga could not deliver to, reported by the callback.', 'mailniaga-smtp'); ?></p>
+                    </div>
+                </div>
+                <div class="mn-hero-stats">
+                    <div class="mn-stat">
+                        <span class="mn-stat-value"><?php echo esc_html(number_format_i18n((int) $total_items)); ?></span>
+                        <span class="mn-stat-label"><?php esc_html_e('Addresses', 'mailniaga-smtp'); ?></span>
+                    </div>
+                </div>
+            </header>
+
+            <section class="mn-card mn-tablecard">
+                <div class="mn-table-scroll">
+                <table class="mn-table">
+                    <thead>
                     <tr>
-                        <td colspan="9" style="text-align: center;">
-							<?php _e('No failed deliveries found.', 'mailniaga-smtp'); ?>
-                        </td>
+                        <th><?php _e('Domain', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('To Email', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('From Email', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('MX', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('Response', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('Created At', 'mailniaga-smtp'); ?></th>
+                        <th><?php _e('Unsubscribed', 'mailniaga-smtp'); ?></th>
                     </tr>
-				<?php else: ?>
-					<?php foreach ($failed_deliveries as $delivery): ?>
+                    </thead>
+                    <tbody>
+					<?php if (empty($failed_deliveries)): ?>
                         <tr>
-                            <td><?php echo esc_html($delivery->id); ?></td>
-                            <td><?php echo esc_html($delivery->domain); ?></td>
-                            <td><?php echo esc_html($delivery->to_email); ?></td>
-                            <td><?php echo esc_html($delivery->from_email); ?></td>
-                            <td><?php echo esc_html($delivery->mx); ?></td>
-                            <td><?php echo esc_html($delivery->delivery_response); ?></td>
-                            <td><?php echo esc_html($delivery->created_at); ?></td>
-                            <td><?php echo $delivery->unsubscribed ? __('Yes', 'mailniaga-smtp') : __('No', 'mailniaga-smtp'); ?></td>
+                            <td colspan="7" class="mn-empty">
+                                <span class="mn-empty-icon mn-empty-icon-good" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+                                <span class="mn-empty-title"><?php _e('No failed deliveries', 'mailniaga-smtp'); ?></span>
+                                <span class="mn-empty-hint"><?php _e('Every email is reaching its inbox. Addresses that bounce will appear here.', 'mailniaga-smtp'); ?></span>
+                            </td>
                         </tr>
-					<?php endforeach; ?>
-				<?php endif; ?>
-                </tbody>
-            </table>
+					<?php else: ?>
+						<?php foreach ($failed_deliveries as $delivery): ?>
+                            <tr>
+                                <td><?php echo $this->cell($delivery->domain); // phpcs:ignore WordPress.Security.EscapeOutput ?></td>
+                                <td><?php echo $this->cell($delivery->to_email); // phpcs:ignore WordPress.Security.EscapeOutput ?></td>
+                                <td><?php echo $this->cell($delivery->from_email); // phpcs:ignore WordPress.Security.EscapeOutput ?></td>
+                                <td class="mn-col-mx"><span title="<?php echo esc_attr($delivery->mx); ?>"><?php echo $this->cell($delivery->mx); // phpcs:ignore WordPress.Security.EscapeOutput ?></span></td>
+                                <td class="mn-col-resp"><span title="<?php echo esc_attr($delivery->delivery_response); ?>"><?php echo $this->cell($delivery->delivery_response); // phpcs:ignore WordPress.Security.EscapeOutput ?></span></td>
+                                <td class="mn-col-date"><?php echo esc_html($delivery->created_at); ?></td>
+                                <td>
+									<?php if ($delivery->unsubscribed): ?>
+                                        <span class="mn-pill mn-pill-sent"><?php _e('Yes', 'mailniaga-smtp'); ?></span>
+									<?php else: ?>
+                                        <span class="mn-pill mn-pill-other"><?php _e('No', 'mailniaga-smtp'); ?></span>
+									<?php endif; ?>
+                                </td>
+                            </tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+                    </tbody>
+                </table>
+                </div>
+            </section>
 			<?php if (!empty($failed_deliveries)): ?>
 				<?php $this->pagination($page, $total_items); ?>
 			<?php endif; ?>
         </div>
 		<?php
+	}
+
+	private function cell($value): string {
+		$value = trim((string) $value);
+
+		if ($value === '') {
+			return '<span class="mn-na">' . esc_html__('N/A', 'mailniaga-smtp') . '</span>';
+		}
+
+		return esc_html($value);
 	}
 
 	private function get_total_failed_deliveries() {
@@ -109,7 +160,7 @@ class MailniagaFailedDeliveriesLog {
 	private function pagination($page, $total_items) {
 		$total_pages = ceil($total_items / $this->per_page);
 
-		echo '<div class="tablenav"><div class="tablenav-pages">';
+		echo '<div class="tablenav mn-pagenav"><div class="tablenav-pages">';
 		echo '<span class="displaying-num">' . sprintf(_n('%s item', '%s items', $total_items, 'mailniaga-smtp'), number_format_i18n($total_items)) . '</span>';
 
 		echo '<span class="pagination-links">';

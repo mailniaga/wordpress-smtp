@@ -61,9 +61,9 @@ class MailniagaConnector {
 		$this->recovery_manager->register();
 
 		add_action('admin_post_mailniaga_send_test_email', [$this, 'handle_test_email']);
+		add_action('wp_ajax_mailniaga_send_test_email', [$this, 'ajax_test_email']);
 		add_action('admin_notices', [$this, 'display_test_email_result']);
 
-		// Add AJAX action for email details
 		add_action('wp_ajax_mailniaga_get_email_details', [$this->email_log, 'get_email_details']);
 	}
 
@@ -85,6 +85,34 @@ class MailniagaConnector {
 
 		wp_redirect(add_query_arg('mailniaga_test_email', '1', admin_url('admin.php?page=mailniaga-smtp')));
 		exit;
+	}
+
+	// AJAX twin of handle_test_email, so the page does not reload.
+	public function ajax_test_email() {
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(['message' => __('You do not have permission to do this.', 'mailniaga-smtp')]);
+		}
+
+		check_ajax_referer('mailniaga_test_email', 'mailniaga_test_email_nonce');
+
+		$to = sanitize_email(wp_unslash($_POST['test_email'] ?? ''));
+
+		if (!is_email($to)) {
+			wp_send_json_error(['message' => __('Enter a valid email address.', 'mailniaga-smtp')]);
+		}
+
+		$result = $this->email_sender->send_test_email($to);
+
+		if (!empty($result['success'])) {
+			wp_send_json_success([
+				/* translators: %s: recipient email address. */
+				'message' => sprintf(__('Test email sent to %s. Check the inbox shortly.', 'mailniaga-smtp'), $to),
+			]);
+		}
+
+		wp_send_json_error([
+			'message' => trim(__('Could not send the test email.', 'mailniaga-smtp') . ' ' . ($result['error_message'] ?? '')),
+		]);
 	}
 
 	private function save_test_email_result($result) {

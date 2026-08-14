@@ -11,10 +11,12 @@ declare(strict_types=1);
 require __DIR__ . '/../includes/src/MailniagaRetryPolicy.php';
 require __DIR__ . '/../includes/src/MailniagaSendBudget.php';
 require __DIR__ . '/../includes/src/MailniagaWebhookLimiter.php';
+require __DIR__ . '/../includes/src/MailniagaOrphanLogCleaner.php';
 
 use Webimpian\MailniagaWPConnector\MailniagaRetryPolicy as Policy;
 use Webimpian\MailniagaWPConnector\MailniagaSendBudget as Budget;
 use Webimpian\MailniagaWPConnector\MailniagaWebhookLimiter as Limiter;
+use Webimpian\MailniagaWPConnector\MailniagaOrphanLogCleaner as Cleaner;
 
 $passed = 0;
 $failed = [];
@@ -171,6 +173,14 @@ check('start of the minute', Limiter::bucket($minute) === Limiter::bucket($minut
 check('same minute shares a bucket', Limiter::bucket($minute) === Limiter::bucket($minute + 59), true);
 check('next minute gets its own', Limiter::bucket($minute) === Limiter::bucket($minute + 60), false);
 check('bucket is a UTC minute stamp', strlen(Limiter::bucket($minute)), 12);
+
+// ---------------------------------------------------------- purge load guard --
+
+check('idle server may purge', Cleaner::load_ok([0.5, 0.4, 0.3], 4.0), true);
+check('busy server may not', Cleaner::load_ok([6.2, 5.0, 4.0], 4.0), false);
+check('exactly at the limit may not', Cleaner::load_ok([4.0, 1.0, 1.0], 4.0), false);
+check('unknown load may purge', Cleaner::load_ok(null, 4.0), true);
+check('malformed load may purge', Cleaner::load_ok([], 4.0), true);
 
 // ------------------------------------------------------------------ report --
 
