@@ -193,13 +193,22 @@ class MailniagaOrphanLogCleaner {
 	private function delete_batch(): int {
 		global $wpdb;
 
-		return (int) $wpdb->query($wpdb->prepare(
-			"DELETE l FROM {$wpdb->prefix}actionscheduler_logs l
+		// MySQL forbids LIMIT in a multi-table DELETE, so collect ids first.
+		$ids = $wpdb->get_col($wpdb->prepare(
+			"SELECT l.log_id FROM {$wpdb->prefix}actionscheduler_logs l
 			 LEFT JOIN {$wpdb->prefix}actionscheduler_actions a ON a.action_id = l.action_id
 			 WHERE a.action_id IS NULL
 			 LIMIT %d",
 			self::BATCH_SIZE
 		));
+
+		if (empty($ids)) {
+			return 0;
+		}
+
+		$ids = implode(',', array_map('intval', $ids));
+
+		return (int) $wpdb->query("DELETE FROM {$wpdb->prefix}actionscheduler_logs WHERE log_id IN ({$ids})");
 	}
 
 	private function load_limit(): float {
